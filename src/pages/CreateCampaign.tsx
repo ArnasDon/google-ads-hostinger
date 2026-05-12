@@ -10,17 +10,20 @@ import { Chip } from '../components/ui/Chip'
 import { Card } from '../components/ui/Card'
 import { StepWizard } from '../components/google-ads/StepWizard'
 import { ReviewSummary } from '../components/google-ads/ReviewSummary'
-import { dummyAccounts } from '../data/dummy'
+import { BudgetRecommendations } from '../components/google-ads/BudgetRecommendations'
+import { dummyAccounts, estimateLeadsForBudget, getBudgetRecommendations } from '../data/dummy'
 import type { Campaign, CampaignDraft } from '../types'
 import { useConnection } from '../context/ConnectionContext'
 import { useToast } from '../context/ToastContext'
 
 const locationSuggestions = ['United Kingdom', 'Germany', 'Canada', 'Australia', 'France', 'Spain']
+const BUDGET_MIN = 5
+const BUDGET_MAX = 500
+const BUDGET_DEFAULT = 15
 
 function estimateLeads(budget: number): string {
-  const low = Math.round(budget * 2.1)
-  const high = Math.round(budget * 3.8)
-  return `${low}–${high}`
+  const { weeklyLeadsLow, weeklyLeadsHigh } = estimateLeadsForBudget(budget)
+  return `${weeklyLeadsLow}–${weeklyLeadsHigh}`
 }
 
 function formatToday(): string {
@@ -40,9 +43,11 @@ export function CreateCampaign() {
   const [keywordInput, setKeywordInput] = useState('')
   const [locationInput, setLocationInput] = useState('')
 
+  const recommendations = useMemo(() => getBudgetRecommendations(), [])
+
   const [draft, setDraft] = useState<CampaignDraft>({
     goal: 'leads',
-    dailyBudget: 10,
+    dailyBudget: BUDGET_DEFAULT,
     businessName: account?.name ?? 'Hostinger Main Account',
     websiteUrl: 'yourdomain.com',
     headlines: [
@@ -192,34 +197,46 @@ export function CreateCampaign() {
 
             <div className="mt-6">
               <div className="flex items-end justify-between mb-3">
-                <label className="text-sm font-medium text-white">Daily budget</label>
+                <div>
+                  <h3 className="text-sm font-semibold text-white">Pick a daily budget</h3>
+                  <p className="text-xs text-hpanel-muted mt-0.5">
+                    Google recommends three starting points based on industry averages.
+                  </p>
+                </div>
+              </div>
+              <BudgetRecommendations
+                recommendations={recommendations}
+                selectedBudget={draft.dailyBudget}
+                onSelect={(b) => setDraft({ ...draft, dailyBudget: b })}
+              />
+            </div>
+
+            <div className="mt-6">
+              <div className="flex items-end justify-between mb-3">
+                <label className="text-sm font-medium text-white">Or set a custom daily budget</label>
                 <span className="text-2xl font-semibold text-white tabular-nums">
                   ${draft.dailyBudget}
                   <span className="text-sm text-hpanel-muted font-normal"> / day</span>
                 </span>
               </div>
               <Slider
-                min={5}
-                max={100}
+                min={BUDGET_MIN}
+                max={BUDGET_MAX}
                 value={draft.dailyBudget}
                 onChange={(e) => setDraft({ ...draft, dailyBudget: Number(e.target.value) })}
               />
               <div className="flex justify-between text-xs text-hpanel-muted mt-2 tabular-nums">
-                <span>$5</span>
-                <span>$100</span>
+                <span>${BUDGET_MIN}</span>
+                <span>${BUDGET_MAX}</span>
               </div>
-            </div>
-
-            <div className="mt-6 rounded-card border border-hpanel-primary/30 bg-hpanel-primary-soft p-4">
-              <div className="flex items-start gap-3">
-                <span className="text-xl">📈</span>
-                <div>
-                  <div className="text-sm text-white font-medium">
-                    Estimated {estimateLeads(draft.dailyBudget)} leads per week
-                  </div>
-                  <p className="text-xs text-hpanel-muted mt-0.5">
-                    Based on your budget and industry averages. Actual results may vary.
-                  </p>
+              <div className="mt-3 rounded-card border border-hpanel-border bg-hpanel-bg/60 p-3">
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="text-base">📈</span>
+                  <span className="text-white">
+                    Estimated <span className="font-semibold">{estimateLeads(draft.dailyBudget)}</span> leads / week
+                  </span>
+                  <span className="text-hpanel-muted">·</span>
+                  <span className="text-hpanel-muted">~{estimateLeadsForBudget(draft.dailyBudget).weeklyClicks.toLocaleString()} clicks</span>
                 </div>
               </div>
             </div>

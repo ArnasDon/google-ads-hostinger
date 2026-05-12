@@ -1,4 +1,31 @@
-import type { Account, Campaign, ChartPoint } from '../types'
+import type { Account, BudgetRecommendation, Campaign, ChartPoint } from '../types'
+
+// Mirrors Google Ads CampaignBudgetRecommendationService which returns
+// 3 budget tiers each with projected impact metrics (impressions, clicks,
+// conversions). Numbers are deterministic per budget so the demo stays
+// realistic when stakeholders fiddle.
+function projectImpact(dailyBudget: number) {
+  const weeklyImpressions = Math.round(dailyBudget * 800)
+  const weeklyClicks = Math.round(dailyBudget * 16)
+  const weeklyLeadsLow = Math.round(dailyBudget * 1.5)
+  const weeklyLeadsHigh = Math.round(dailyBudget * 2.6)
+  return { weeklyImpressions, weeklyClicks, weeklyLeadsLow, weeklyLeadsHigh }
+}
+
+export function getBudgetRecommendations(): BudgetRecommendation[] {
+  return (
+    [
+      { tier: 'conservative', dailyBudget: 5 },
+      { tier: 'recommended', dailyBudget: 15 },
+      { tier: 'aggressive', dailyBudget: 40 },
+    ] as const
+  ).map((r) => ({ ...r, ...projectImpact(r.dailyBudget) }))
+}
+
+export function estimateLeadsForBudget(dailyBudget: number) {
+  return projectImpact(dailyBudget)
+}
+
 
 export const dummyAccounts: Account[] = [
   {
