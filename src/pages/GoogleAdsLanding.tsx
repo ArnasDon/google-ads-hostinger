@@ -26,8 +26,8 @@ export function GoogleAdsLanding() {
   const { connect, isConnecting, authCancelled, cancelAuth, dismissCancelled } = useConnection()
   const [modalOpen, setModalOpen] = useState(false)
 
-  const handleAllow = async () => {
-    await connect()
+  const handleAllow = async (isNewUser: boolean) => {
+    await connect(isNewUser)
     setModalOpen(false)
   }
 
