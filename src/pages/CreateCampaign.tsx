@@ -13,6 +13,7 @@ import { ReviewSummary } from '../components/google-ads/ReviewSummary'
 import { BudgetRecommendations } from '../components/google-ads/BudgetRecommendations'
 import { AdPreview } from '../components/google-ads/AdPreview'
 import { AudiencePreview } from '../components/google-ads/AudiencePreview'
+import { EuPoliticalDeclaration } from '../components/google-ads/EuPoliticalDeclaration'
 import { dummyAccounts, estimateLeadsForBudget, getBudgetRecommendations } from '../data/dummy'
 import type { Campaign, CampaignDraft } from '../types'
 import { useConnection } from '../context/ConnectionContext'
@@ -44,6 +45,7 @@ export function CreateCampaign() {
   const [submitting, setSubmitting] = useState(false)
   const [keywordInput, setKeywordInput] = useState('')
   const [locationInput, setLocationInput] = useState('')
+  const [euDeclarationError, setEuDeclarationError] = useState(false)
 
   const recommendations = useMemo(() => getBudgetRecommendations(), [])
 
@@ -64,6 +66,7 @@ export function CreateCampaign() {
     locations: ['United States'],
     language: 'English',
     keywords: ['web hosting', 'website builder', 'small business website'],
+    euPoliticalAdsStatus: null,
   })
 
   const campaignName = useMemo(
@@ -122,6 +125,11 @@ export function CreateCampaign() {
   }
 
   const createCampaign = async (asDraft: boolean) => {
+    if (!draft.euPoliticalAdsStatus) {
+      setEuDeclarationError(true)
+      return
+    }
+    setEuDeclarationError(false)
     setSubmitting(true)
     await new Promise((r) => setTimeout(r, 900))
 
@@ -149,6 +157,7 @@ export function CreateCampaign() {
       locations: [...draft.locations],
       language: draft.language,
       keywords: [...draft.keywords],
+      euPoliticalAdsStatus: draft.euPoliticalAdsStatus,
     }
     addCampaign(account.id, newCampaign)
     setSubmitting(false)
@@ -469,6 +478,17 @@ export function CreateCampaign() {
                   </p>
                 </div>
               </div>
+            </div>
+
+            <div className="mt-3">
+              <EuPoliticalDeclaration
+                value={draft.euPoliticalAdsStatus}
+                onChange={(s) => {
+                  setDraft({ ...draft, euPoliticalAdsStatus: s })
+                  setEuDeclarationError(false)
+                }}
+                error={euDeclarationError}
+              />
             </div>
           </StepWizard>
         )}
