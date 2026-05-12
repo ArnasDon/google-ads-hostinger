@@ -11,6 +11,8 @@ import { Card } from '../components/ui/Card'
 import { StepWizard } from '../components/google-ads/StepWizard'
 import { ReviewSummary } from '../components/google-ads/ReviewSummary'
 import { BudgetRecommendations } from '../components/google-ads/BudgetRecommendations'
+import { AdPreview } from '../components/google-ads/AdPreview'
+import { AudiencePreview } from '../components/google-ads/AudiencePreview'
 import { dummyAccounts, estimateLeadsForBudget, getBudgetRecommendations } from '../data/dummy'
 import type { Campaign, CampaignDraft } from '../types'
 import { useConnection } from '../context/ConnectionContext'
@@ -167,7 +169,7 @@ export function CreateCampaign() {
         ]}
       />
 
-      <div className="max-w-3xl mx-auto">
+      <div className={step === 2 || step === 3 ? 'max-w-6xl mx-auto' : 'max-w-3xl mx-auto'}>
         {step === 1 && (
           <StepWizard
             step={1}
@@ -244,6 +246,8 @@ export function CreateCampaign() {
         )}
 
         {step === 2 && (
+          <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
+            <div>
           <StepWizard
             step={2}
             totalSteps={4}
@@ -312,9 +316,19 @@ export function CreateCampaign() {
               </div>
             </div>
           </StepWizard>
+            </div>
+            <AdPreview
+              businessName={draft.businessName}
+              websiteUrl={draft.websiteUrl}
+              headlines={draft.headlines}
+              descriptions={draft.descriptions}
+            />
+          </div>
         )}
 
         {step === 3 && (
+          <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
+            <div>
           <StepWizard
             step={3}
             totalSteps={4}
@@ -400,6 +414,14 @@ export function CreateCampaign() {
               </div>
             </div>
           </StepWizard>
+            </div>
+            <AudiencePreview
+              businessName={draft.businessName}
+              locations={draft.locations}
+              language={draft.language}
+              keywords={draft.keywords}
+            />
+          </div>
         )}
 
         {step === 4 && (
