@@ -2,6 +2,12 @@ export type CampaignStatus = 'Active' | 'Paused' | 'Draft'
 
 export type AccountStatus = 'Active' | 'Inactive'
 
+// Mirrors Google Ads EuPoliticalAdvertisingStatusEnum.EuPoliticalAdvertisingStatus
+// https://developers.google.com/google-ads/api/reference/rpc/v23/EuPoliticalAdvertisingStatusEnum.EuPoliticalAdvertisingStatus
+export type EuPoliticalAdsStatus =
+  | 'CONTAINS_EU_POLITICAL_ADVERTISING'
+  | 'DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING'
+
 export interface Account {
   id: string
   name: string
@@ -30,6 +36,7 @@ export interface Campaign {
   locations?: string[]
   language?: string
   keywords?: string[]
+  euPoliticalAdsStatus?: EuPoliticalAdsStatus
 }
 
 export interface CampaignDraft {
@@ -42,6 +49,7 @@ export interface CampaignDraft {
   locations: string[]
   language: string
   keywords: string[]
+  euPoliticalAdsStatus: EuPoliticalAdsStatus | null
 }
 
 export interface ChartPoint {
