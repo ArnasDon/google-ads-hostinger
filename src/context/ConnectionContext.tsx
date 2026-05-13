@@ -15,6 +15,9 @@ interface ConnectionContextValue {
   cancelAuth: () => void
   dismissCancelled: () => void
   dismissCreditBanner: () => void
+  /** Offboards the user: unlinks the Ads account from Hostinger and from the
+   *  Hostinger MCC, resets the in-memory campaign state, returns to landing. */
+  disconnect: () => void
   campaignsByAccount: Record<string, Campaign[]>
   addCampaign: (accountId: string, campaign: Campaign) => void
   updateCampaignStatus: (accountId: string, campaignId: string, status: CampaignStatus) => void
@@ -56,6 +59,19 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const dismissCreditBanner = useCallback(() => setCreditBannerDismissed(true), [])
+
+  const disconnect = useCallback(() => {
+    setIsConnected(false)
+    setIsConnecting(false)
+    setIsNewUser(false)
+    setGoogleAccountEmail(null)
+    setCreditBannerDismissed(false)
+    setAuthCancelled(false)
+    // Restore seed campaigns so re-connecting as an existing user goes back
+    // to the familiar starting state (mirrors what a fresh Google Ads fetch
+    // would return).
+    setCampaignsByAccount(dummyCampaigns)
+  }, [])
 
   const cancelAuth = useCallback(() => {
     setIsConnecting(false)
@@ -130,6 +146,7 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
       cancelAuth,
       dismissCancelled,
       dismissCreditBanner,
+      disconnect,
       campaignsByAccount,
       addCampaign,
       updateCampaignStatus,
@@ -148,6 +165,7 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
       cancelAuth,
       dismissCancelled,
       dismissCreditBanner,
+      disconnect,
       campaignsByAccount,
       addCampaign,
       updateCampaignStatus,
