@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { X } from 'lucide-react'
 import { Modal } from '../ui/Modal'
 import { Button } from '../ui/Button'
@@ -9,6 +9,7 @@ import { Chip } from '../ui/Chip'
 import { ConversionTracking } from './ConversionTracking'
 import { EuPoliticalDeclaration } from './EuPoliticalDeclaration'
 import type { Campaign, ConversionTrackingConfig, EuPoliticalAdsStatus } from '../../types'
+import { locationSuggestions } from '../../data/dummy'
 import { useToast } from '../../context/ToastContext'
 
 interface EditCampaignDrawerProps {
@@ -17,8 +18,6 @@ interface EditCampaignDrawerProps {
   onClose: () => void
   onSave: (patch: Partial<Campaign>) => void
 }
-
-const locationSuggestions = ['United Kingdom', 'Germany', 'Canada', 'Australia', 'France', 'Spain']
 
 export function EditCampaignDrawer({ open, campaign, onClose, onSave }: EditCampaignDrawerProps) {
   const { showToast } = useToast()
@@ -47,6 +46,17 @@ export function EditCampaignDrawer({ open, campaign, onClose, onSave }: EditCamp
     setEuPoliticalAdsStatus(campaign.euPoliticalAdsStatus ?? null)
     setErrors({})
   }, [open, campaign])
+
+  // Memoized so ConversionTracking / EuPoliticalDeclaration can rely on a
+  // stable `onChange` identity and keep it in their effect dep arrays.
+  const handleConversionChange = useCallback((c: ConversionTrackingConfig) => {
+    setConversionTracking(c)
+    setErrors((er) => ({ ...er, conversion: false }))
+  }, [])
+  const handleEuChange = useCallback((s: EuPoliticalAdsStatus) => {
+    setEuPoliticalAdsStatus(s)
+    setErrors((er) => ({ ...er, eu: false }))
+  }, [])
 
   const conversionValid = useMemo(() => {
     if (!conversionTracking) return false
@@ -86,7 +96,7 @@ export function EditCampaignDrawer({ open, campaign, onClose, onSave }: EditCamp
             Edit campaign settings
           </h2>
           <p className="text-xs text-hpanel-muted mt-0.5">
-            Changes apply immediately. Only V1-required fields are editable.
+            Changes apply immediately. Ad creatives (headlines, descriptions, images) can't be edited after a campaign is created.
           </p>
         </div>
         <button
@@ -191,10 +201,7 @@ export function EditCampaignDrawer({ open, campaign, onClose, onSave }: EditCamp
         <Section title="Conversion tracking">
           <ConversionTracking
             value={conversionTracking}
-            onChange={(c) => {
-              setConversionTracking(c)
-              setErrors((er) => ({ ...er, conversion: false }))
-            }}
+            onChange={handleConversionChange}
             error={errors.conversion}
           />
         </Section>
@@ -202,10 +209,7 @@ export function EditCampaignDrawer({ open, campaign, onClose, onSave }: EditCamp
         <Section title="Declarations">
           <EuPoliticalDeclaration
             value={euPoliticalAdsStatus}
-            onChange={(s) => {
-              setEuPoliticalAdsStatus(s)
-              setErrors((er) => ({ ...er, eu: false }))
-            }}
+            onChange={handleEuChange}
             error={errors.eu}
           />
         </Section>

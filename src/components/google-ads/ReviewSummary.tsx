@@ -1,3 +1,4 @@
+import { Globe, MapPin } from 'lucide-react'
 import type { CampaignDraft } from '../../types'
 
 interface ReviewSummaryProps {
@@ -39,12 +40,15 @@ export function ReviewSummary({ campaignName, draft }: ReviewSummaryProps) {
         value={
           <div className="flex flex-wrap gap-1.5">
             {draft.locations.map((l) => (
-              <span key={l} className="inline-flex items-center gap-1 rounded-full border border-hpanel-border-strong px-2 py-0.5 text-xs text-white">
-                {l}
+              <span
+                key={l}
+                className="inline-flex items-center gap-1 rounded-full border border-hpanel-border-strong bg-white/5 px-2 py-0.5 text-xs text-white"
+              >
+                <MapPin size={11} className="text-hpanel-muted" aria-hidden /> {l}
               </span>
             ))}
-            <span className="inline-flex items-center gap-1 rounded-full border border-hpanel-border-strong px-2 py-0.5 text-xs text-white">
-              {draft.language}
+            <span className="inline-flex items-center gap-1 rounded-full border border-hpanel-primary/30 bg-hpanel-primary-soft px-2 py-0.5 text-xs text-white">
+              <Globe size={11} className="text-hpanel-primary-hover" aria-hidden /> {draft.language}
             </span>
           </div>
         }
