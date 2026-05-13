@@ -1,11 +1,14 @@
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Breadcrumbs } from '../components/ui/Breadcrumbs'
 import { Button } from '../components/ui/Button'
 import { Badge } from '../components/ui/Badge'
 import { MetricCard } from '../components/google-ads/MetricCard'
-import { PerformanceChart } from '../components/google-ads/PerformanceChart'
 import { EditCampaignDrawer } from '../components/google-ads/EditCampaignDrawer'
+
+// recharts is ~150 KB minified — lazy-load it so the rest of the app
+// (landing, account list, wizard, edit drawer) doesn't pay the cost.
+const PerformanceChart = lazy(() => import('../components/google-ads/PerformanceChart'))
 import { dummyAccounts, dummyChart } from '../data/dummy'
 import { useConnection } from '../context/ConnectionContext'
 import { useToast } from '../context/ToastContext'
@@ -93,7 +96,9 @@ export function CampaignDetails() {
             <option>Last 30 days</option>
           </select>
         </div>
-        <PerformanceChart data={dummyChart} />
+        <Suspense fallback={<ChartSkeleton />}>
+          <PerformanceChart data={dummyChart} />
+        </Suspense>
       </div>
 
       <EditCampaignDrawer
@@ -103,6 +108,16 @@ export function CampaignDetails() {
         onSave={(patch) => updateCampaign(id, campaignId, patch)}
       />
     </div>
+  )
+}
+
+function ChartSkeleton() {
+  return (
+    <div
+      className="w-full h-72 rounded-card bg-hpanel-bg/40 border border-hpanel-border animate-pulse"
+      aria-label="Loading performance chart"
+      role="status"
+    />
   )
 }
 
