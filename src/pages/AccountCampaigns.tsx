@@ -8,6 +8,7 @@ import { Modal } from '../components/ui/Modal'
 import { CampaignTable } from '../components/google-ads/CampaignTable'
 import { CustomerReporting } from '../components/google-ads/CustomerReporting'
 import { CreditBanner } from '../components/google-ads/CreditBanner'
+import { BillingSetupBanner } from '../components/google-ads/BillingSetupBanner'
 import { dummyAccounts } from '../data/dummy'
 import { useConnection } from '../context/ConnectionContext'
 import { useToast } from '../context/ToastContext'
@@ -22,6 +23,7 @@ export function AccountCampaigns() {
     creditBannerDismissed,
     dismissCreditBanner,
     googleAccountEmail,
+    billingSetupCompleted,
     disconnect,
   } = useConnection()
   const { showToast } = useToast()
@@ -112,6 +114,8 @@ export function AccountCampaigns() {
           </div>
         </div>
       </div>
+
+      {!billingSetupCompleted && <BillingSetupBanner />}
 
       {showCreditBanner && <CreditBanner onDismiss={dismissCreditBanner} />}
 
