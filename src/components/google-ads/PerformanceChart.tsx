@@ -5,7 +5,7 @@ interface PerformanceChartProps {
   data: ChartPoint[]
 }
 
-export function PerformanceChart({ data }: PerformanceChartProps) {
+export default function PerformanceChart({ data }: PerformanceChartProps) {
   return (
     <div className="w-full h-72">
       <ResponsiveContainer width="100%" height="100%">
