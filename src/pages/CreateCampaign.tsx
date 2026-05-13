@@ -318,7 +318,8 @@ export function CreateCampaign() {
             <div className="mt-6">
               <h3 className="text-sm font-semibold text-white mb-1">Images (optional)</h3>
               <p className="text-xs text-hpanel-muted mb-3">Add visuals to help your ads stand out. Demo only — no upload required.</p>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid gap-3 sm:grid-cols-3">
+                <ImagePlaceholder ratio="1 : 1" label="Logo" />
                 <ImagePlaceholder ratio="1.91 : 1" label="Landscape" />
                 <ImagePlaceholder ratio="1 : 1" label="Square" />
               </div>

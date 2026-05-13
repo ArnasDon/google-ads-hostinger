@@ -6,6 +6,9 @@ interface ConnectionContextValue {
   isConnected: boolean
   isConnecting: boolean
   isNewUser: boolean
+  /** Google account that was authorized — every Ads account on the workspace
+   *  is mapped to this email per the OAuth scope. */
+  googleAccountEmail: string | null
   creditBannerDismissed: boolean
   authCancelled: boolean
   connect: (isNewUser: boolean) => Promise<void>
@@ -19,12 +22,16 @@ interface ConnectionContextValue {
   approveReview: (accountId: string, campaignId: string) => void
 }
 
+// Demo email — in production we'd read this from the OAuth `id_token` claims.
+const DEMO_GOOGLE_EMAIL = 'you@gmail.com'
+
 const ConnectionContext = createContext<ConnectionContextValue | null>(null)
 
 export function ConnectionProvider({ children }: { children: ReactNode }) {
   const [isConnected, setIsConnected] = useState(false)
   const [isConnecting, setIsConnecting] = useState(false)
   const [isNewUser, setIsNewUser] = useState(false)
+  const [googleAccountEmail, setGoogleAccountEmail] = useState<string | null>(null)
   const [creditBannerDismissed, setCreditBannerDismissed] = useState(false)
   const [authCancelled, setAuthCancelled] = useState(false)
   const [campaignsByAccount, setCampaignsByAccount] = useState<Record<string, Campaign[]>>(dummyCampaigns)
@@ -41,6 +48,7 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
       setCampaignsByAccount((prev) => ({ ...prev, [PRIMARY_ACCOUNT_ID]: [] }))
     }
     setIsNewUser(newUser)
+    setGoogleAccountEmail(DEMO_GOOGLE_EMAIL)
     setCreditBannerDismissed(false)
     setIsConnected(true)
     setIsConnecting(false)
@@ -104,6 +112,7 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
       isConnected,
       isConnecting,
       isNewUser,
+      googleAccountEmail,
       creditBannerDismissed,
       authCancelled,
       connect,
@@ -120,6 +129,7 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
       isConnected,
       isConnecting,
       isNewUser,
+      googleAccountEmail,
       creditBannerDismissed,
       authCancelled,
       connect,

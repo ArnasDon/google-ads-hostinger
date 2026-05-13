@@ -12,7 +12,13 @@ export function AccountCampaigns() {
   const { id = '' } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const account = dummyAccounts.find((a) => a.id === id)
-  const { campaignsByAccount, isNewUser, creditBannerDismissed, dismissCreditBanner } = useConnection()
+  const {
+    campaignsByAccount,
+    isNewUser,
+    creditBannerDismissed,
+    dismissCreditBanner,
+    googleAccountEmail,
+  } = useConnection()
   const campaigns = campaignsByAccount[id] ?? []
   const showCreditBanner = isNewUser && !creditBannerDismissed
 
@@ -42,6 +48,11 @@ export function AccountCampaigns() {
             <Badge tone={account.status === 'Active' ? 'success' : 'neutral'}>{account.status}</Badge>
           </div>
           <p className="text-sm text-hpanel-muted mt-1 font-mono">Account ID: {account.externalId}</p>
+          {googleAccountEmail && (
+            <p className="text-xs text-hpanel-muted-strong mt-1">
+              Connected as <span className="text-white font-medium">{googleAccountEmail}</span>
+            </p>
+          )}
         </div>
         <Button
           onClick={() => navigate(`/marketing/google-ads/accounts/${account.id}/new-campaign`)}

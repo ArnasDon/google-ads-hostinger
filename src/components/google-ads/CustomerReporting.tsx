@@ -8,10 +8,14 @@ interface CustomerReportingProps {
 export function CustomerReporting({ campaigns }: CustomerReportingProps) {
   const totals = useMemo(() => {
     const active = campaigns.filter((c) => c.status !== 'Draft')
+    const clicks = active.reduce((sum, c) => sum + c.clicks, 0)
+    const cost = active.reduce((sum, c) => sum + c.cost, 0)
+    const conversions = active.reduce((sum, c) => sum + c.conversions, 0)
     return {
-      clicks: active.reduce((sum, c) => sum + c.clicks, 0),
-      cost: active.reduce((sum, c) => sum + c.cost, 0),
-      conversions: active.reduce((sum, c) => sum + c.conversions, 0),
+      clicks,
+      cost,
+      conversions,
+      costPerLead: conversions > 0 ? cost / conversions : null,
       activeCount: active.filter((c) => c.status === 'Active').length,
       totalCount: active.length,
     }
@@ -26,10 +30,14 @@ export function CustomerReporting({ campaigns }: CustomerReportingProps) {
         </p>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Tile label="Clicks" value={totals.clicks.toLocaleString()} />
         <Tile label="Cost" value={`$${totals.cost.toFixed(2)}`} />
         <Tile label="Conversions" value={totals.conversions.toLocaleString()} />
+        <Tile
+          label="Cost / lead"
+          value={totals.costPerLead === null ? '—' : `$${totals.costPerLead.toFixed(2)}`}
+        />
       </div>
     </div>
   )
