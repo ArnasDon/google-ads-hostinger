@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { LinkIcon, MoreVertical, Unlink } from 'lucide-react'
+import { AlertOctagon, LinkIcon, MoreVertical, ShieldCheck, Unlink } from 'lucide-react'
 import { Breadcrumbs } from '../components/ui/Breadcrumbs'
 import { Badge } from '../components/ui/Badge'
 import { Button } from '../components/ui/Button'
@@ -9,6 +9,7 @@ import { CampaignTable } from '../components/google-ads/CampaignTable'
 import { CustomerReporting } from '../components/google-ads/CustomerReporting'
 import { CreditBanner } from '../components/google-ads/CreditBanner'
 import { BillingSetupBanner } from '../components/google-ads/BillingSetupBanner'
+import { SuspensionAlert } from '../components/google-ads/SuspensionAlert'
 import { dummyAccounts } from '../data/dummy'
 import { useConnection } from '../context/ConnectionContext'
 import { useToast } from '../context/ToastContext'
@@ -24,6 +25,8 @@ export function AccountCampaigns() {
     dismissCreditBanner,
     googleAccountEmail,
     billingSetupCompleted,
+    accountSuspended,
+    setAccountSuspended,
     disconnect,
   } = useConnection()
   const { showToast } = useToast()
@@ -58,6 +61,15 @@ export function AccountCampaigns() {
     )
   }
 
+  const effectiveStatus = accountSuspended ? 'Suspended' : account.status
+  const statusTone =
+    effectiveStatus === 'Suspended'
+      ? 'danger'
+      : effectiveStatus === 'Active'
+      ? 'success'
+      : 'neutral'
+  const blockCreate = effectiveStatus !== 'Active'
+
   return (
     <div>
       <Breadcrumbs items={[{ label: 'Marketing' }, { label: 'Google Ads' }]} />
@@ -66,7 +78,7 @@ export function AccountCampaigns() {
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-semibold text-white">{account.name}</h1>
-            <Badge tone={account.status === 'Active' ? 'success' : 'neutral'}>{account.status}</Badge>
+            <Badge tone={statusTone}>{effectiveStatus}</Badge>
           </div>
           <p className="text-sm text-hpanel-muted mt-1 font-mono">Account ID: {account.externalId}</p>
           {googleAccountEmail && (
@@ -78,7 +90,14 @@ export function AccountCampaigns() {
         <div className="flex items-center gap-2">
           <Button
             onClick={() => navigate(`/marketing/google-ads/accounts/${account.id}/new-campaign`)}
-            disabled={account.status === 'Inactive'}
+            disabled={blockCreate}
+            title={
+              blockCreate
+                ? effectiveStatus === 'Suspended'
+                  ? "Account is suspended — appeal in Google Ads first"
+                  : 'Account is inactive'
+                : undefined
+            }
           >
             + Create new campaign
           </Button>
@@ -96,8 +115,35 @@ export function AccountCampaigns() {
             {menuOpen && (
               <div
                 role="menu"
-                className="absolute right-0 top-11 z-10 min-w-[220px] rounded-card border border-hpanel-border bg-hpanel-surface shadow-card py-1"
+                className="absolute right-0 top-11 z-10 min-w-[240px] rounded-card border border-hpanel-border bg-hpanel-surface shadow-card py-1"
               >
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    setMenuOpen(false)
+                    const next = !accountSuspended
+                    setAccountSuspended(next)
+                    showToast(
+                      next
+                        ? 'Account suspended (demo). Campaigns are no longer serving.'
+                        : 'Account restored (demo). Campaigns can serve again.',
+                      next ? 'warning' : 'success'
+                    )
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-white hover:bg-white/5 transition"
+                >
+                  {accountSuspended ? (
+                    <>
+                      <ShieldCheck size={14} className="text-hpanel-success" /> Simulate restoration (demo)
+                    </>
+                  ) : (
+                    <>
+                      <AlertOctagon size={14} className="text-hpanel-warning" /> Simulate suspension (demo)
+                    </>
+                  )}
+                </button>
+                <div className="my-1 border-t border-hpanel-border" />
                 <button
                   type="button"
                   role="menuitem"
@@ -115,7 +161,9 @@ export function AccountCampaigns() {
         </div>
       </div>
 
-      {!billingSetupCompleted && <BillingSetupBanner />}
+      {accountSuspended && <SuspensionAlert />}
+
+      {!billingSetupCompleted && !accountSuspended && <BillingSetupBanner />}
 
       {showCreditBanner && <CreditBanner onDismiss={dismissCreditBanner} />}
 
