@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
 import { dummyCampaigns, PRIMARY_ACCOUNT_ID } from '../data/dummy'
-import type { Campaign, CampaignStatus } from '../types'
+import type { AccountSettings, Campaign, CampaignStatus } from '../types'
 
 export type ConnectPhase = 'idle' | 'authorizing' | 'creating' | 'linking-mcc' | 'fetching'
 
@@ -14,6 +14,12 @@ interface ConnectionContextValue {
   /** Google account that was authorized — every Ads account on the workspace
    *  is mapped to this email per the OAuth scope. */
   googleAccountEmail: string | null
+  /** Settings the user picked during account creation (country, time zone,
+   *  currency). null for existing users; populated after the setup wizard. */
+  accountSettings: AccountSettings | null
+  /** True while we're waiting on the new-user to finish the Create-Ads-Account
+   *  wizard (between OAuth Allow and the simulated CustomerService creation). */
+  setupPending: boolean
   /** Whether the user has finished the billing-setup step inside Google Ads
    *  (payment method + invitation acceptance). Real implementations track this
    *  via the GAFE return state; existing users start `true`, new users `false`. */
@@ -45,6 +51,13 @@ interface ConnectionContextValue {
   /** Simulates running the Google Tag installer against the user's site —
    *  resolves after ~1.5s and flips `googleTagDeployed` to true. */
   deployGoogleTag: () => Promise<void>
+  /** Called by the Create-Ads-Account wizard once the user picks
+   *  country/TZ/currency and accepts ToS. Runs the simulated CustomerService
+   *  create + MCC link, then finalises the connection. */
+  finalizeAccountCreation: (settings: AccountSettings) => Promise<void>
+  /** User backed out of the setup wizard — cancel the in-flight new-user flow
+   *  and return them to the disconnected landing. */
+  cancelAccountSetup: () => void
 }
 
 // Demo email — in production we'd read this from the OAuth `id_token` claims.
@@ -58,6 +71,8 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
   const [connectPhase, setConnectPhase] = useState<ConnectPhase>('idle')
   const [isNewUser, setIsNewUser] = useState(false)
   const [googleAccountEmail, setGoogleAccountEmail] = useState<string | null>(null)
+  const [accountSettings, setAccountSettings] = useState<AccountSettings | null>(null)
+  const [setupPending, setSetupPending] = useState(false)
   const [billingSetupCompleted, setBillingSetupCompleted] = useState(false)
   const [accountSuspended, setAccountSuspended] = useState(false)
   const [googleTagDeployed, setGoogleTagDeployed] = useState(false)
@@ -68,36 +83,59 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
   const connect = useCallback(async (newUser: boolean) => {
     setIsConnecting(true)
     setAuthCancelled(false)
+    setConnectPhase('authorizing')
+    await new Promise((resolve) => setTimeout(resolve, 700))
 
     if (newUser) {
-      // New users walk through three visible sub-stages so the loader copy
-      // reflects what's actually happening server-side — the OAuth modal
-      // reads connectPhase to label the spinner.
-      setConnectPhase('authorizing')
-      await new Promise((resolve) => setTimeout(resolve, 700))
-      setConnectPhase('creating')
-      await new Promise((resolve) => setTimeout(resolve, 800))
-      setConnectPhase('linking-mcc')
-      await new Promise((resolve) => setTimeout(resolve, 600))
-      // Freshly created account has no campaigns yet.
-      setCampaignsByAccount((prev) => ({ ...prev, [PRIMARY_ACCOUNT_ID]: [] }))
-    } else {
-      setConnectPhase('fetching')
-      await new Promise((resolve) => setTimeout(resolve, 1200))
+      // OAuth is complete; account creation requires the user to pick a
+      // billing country / time zone / currency + accept ToS first. Pause
+      // here so the Create-Ads-Account wizard can collect those, then call
+      // finalizeAccountCreation() to resume the flow.
+      setGoogleAccountEmail(DEMO_GOOGLE_EMAIL)
+      setSetupPending(true)
+      setIsConnecting(false)
+      setConnectPhase('idle')
+      return
     }
 
-    // New users still need to add a payment method + accept the Google Ads
-    // invitation; existing users already have billing set up.
-    setBillingSetupCompleted(!newUser)
-    // Existing users have the Google Tag installed already; new users need
-    // to deploy it (one-time, site-wide).
-    setGoogleTagDeployed(!newUser)
-    setIsNewUser(newUser)
+    // Existing user: skip the wizard and pull their account directly.
+    setConnectPhase('fetching')
+    await new Promise((resolve) => setTimeout(resolve, 1200))
+    setBillingSetupCompleted(true)
+    setGoogleTagDeployed(true)
+    setIsNewUser(false)
     setGoogleAccountEmail(DEMO_GOOGLE_EMAIL)
     setCreditBannerDismissed(false)
     setIsConnected(true)
     setIsConnecting(false)
     setConnectPhase('idle')
+  }, [])
+
+  const finalizeAccountCreation = useCallback(async (settings: AccountSettings) => {
+    setIsConnecting(true)
+    setConnectPhase('creating')
+    await new Promise((resolve) => setTimeout(resolve, 800))
+    setConnectPhase('linking-mcc')
+    await new Promise((resolve) => setTimeout(resolve, 600))
+
+    // Freshly created account has no campaigns yet.
+    setCampaignsByAccount((prev) => ({ ...prev, [PRIMARY_ACCOUNT_ID]: [] }))
+    setAccountSettings(settings)
+    setBillingSetupCompleted(false)
+    setGoogleTagDeployed(false)
+    setIsNewUser(true)
+    setCreditBannerDismissed(false)
+    setIsConnected(true)
+    setSetupPending(false)
+    setIsConnecting(false)
+    setConnectPhase('idle')
+  }, [])
+
+  const cancelAccountSetup = useCallback(() => {
+    setSetupPending(false)
+    setIsConnecting(false)
+    setConnectPhase('idle')
+    setGoogleAccountEmail(null)
   }, [])
 
   const dismissCreditBanner = useCallback(() => setCreditBannerDismissed(true), [])
@@ -115,6 +153,8 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
     setConnectPhase('idle')
     setIsNewUser(false)
     setGoogleAccountEmail(null)
+    setAccountSettings(null)
+    setSetupPending(false)
     setBillingSetupCompleted(false)
     setAccountSuspended(false)
     setGoogleTagDeployed(false)
@@ -195,6 +235,8 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
       connectPhase,
       isNewUser,
       googleAccountEmail,
+      accountSettings,
+      setupPending,
       billingSetupCompleted,
       accountSuspended,
       googleTagDeployed,
@@ -214,6 +256,8 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
       completeBillingSetup,
       setAccountSuspended,
       deployGoogleTag,
+      finalizeAccountCreation,
+      cancelAccountSetup,
     }),
     [
       isConnected,
@@ -221,6 +265,8 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
       connectPhase,
       isNewUser,
       googleAccountEmail,
+      accountSettings,
+      setupPending,
       billingSetupCompleted,
       accountSuspended,
       googleTagDeployed,
@@ -240,6 +286,8 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
       completeBillingSetup,
       setAccountSuspended,
       deployGoogleTag,
+      finalizeAccountCreation,
+      cancelAccountSetup,
     ]
   )
 

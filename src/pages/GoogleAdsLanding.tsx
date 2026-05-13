@@ -3,6 +3,7 @@ import { AlertTriangle, MousePointerClick, Search, Send, Sparkles, X } from 'luc
 import { Card } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 import { OAuthModal } from '../components/google-ads/OAuthModal'
+import { CreateAccountWizard } from '../components/google-ads/CreateAccountWizard'
 import { useConnection } from '../context/ConnectionContext'
 
 interface Benefit {
@@ -89,6 +90,7 @@ export function GoogleAdsLanding() {
       </div>
 
       <OAuthModal open={modalOpen} onCancel={handleCancel} onAllow={handleAllow} loading={isConnecting} />
+      <CreateAccountWizard />
     </div>
   )
 }
