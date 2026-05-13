@@ -3,15 +3,13 @@ import type { CampaignDraft } from '../../types'
 interface ReviewSummaryProps {
   campaignName: string
   draft: CampaignDraft
-  estimatedLeads: string
 }
 
-export function ReviewSummary({ campaignName, draft, estimatedLeads }: ReviewSummaryProps) {
+export function ReviewSummary({ campaignName, draft }: ReviewSummaryProps) {
   return (
     <div className="bg-hpanel-bg/60 border border-hpanel-border rounded-card divide-y divide-hpanel-border">
       <Row label="Campaign name" value={campaignName} />
       <Row label="Daily budget" value={`$${draft.dailyBudget}`} />
-      <Row label="Estimated weekly leads" value={estimatedLeads} />
       <Row label="Business name" value={draft.businessName} />
       <Row label="Website" value={draft.websiteUrl} />
       {draft.conversionTracking && (

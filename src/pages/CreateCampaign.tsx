@@ -10,12 +10,11 @@ import { Chip } from '../components/ui/Chip'
 import { Card } from '../components/ui/Card'
 import { StepWizard } from '../components/google-ads/StepWizard'
 import { ReviewSummary } from '../components/google-ads/ReviewSummary'
-import { BudgetRecommendations } from '../components/google-ads/BudgetRecommendations'
 import { AdPreview } from '../components/google-ads/AdPreview'
 import { AudiencePreview } from '../components/google-ads/AudiencePreview'
 import { EuPoliticalDeclaration } from '../components/google-ads/EuPoliticalDeclaration'
 import { ConversionTracking } from '../components/google-ads/ConversionTracking'
-import { dummyAccounts, estimateLeadsForBudget, getBudgetRecommendations } from '../data/dummy'
+import { dummyAccounts } from '../data/dummy'
 import type { Campaign, CampaignDraft } from '../types'
 import { useConnection } from '../context/ConnectionContext'
 import { useToast } from '../context/ToastContext'
@@ -24,11 +23,6 @@ const locationSuggestions = ['United Kingdom', 'Germany', 'Canada', 'Australia',
 const BUDGET_MIN = 5
 const BUDGET_MAX = 500
 const BUDGET_DEFAULT = 15
-
-function estimateLeads(budget: number): string {
-  const { weeklyLeadsLow, weeklyLeadsHigh } = estimateLeadsForBudget(budget)
-  return `${weeklyLeadsLow}–${weeklyLeadsHigh}`
-}
 
 function formatToday(): string {
   return new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
@@ -47,8 +41,6 @@ export function CreateCampaign() {
   const [locationInput, setLocationInput] = useState('')
   const [euDeclarationError, setEuDeclarationError] = useState(false)
   const [conversionError, setConversionError] = useState(false)
-
-  const recommendations = useMemo(() => getBudgetRecommendations(), [])
 
   const [draft, setDraft] = useState<CampaignDraft>({
     goal: 'leads',
@@ -213,23 +205,7 @@ export function CreateCampaign() {
 
             <div className="mt-6">
               <div className="flex items-end justify-between mb-3">
-                <div>
-                  <h3 className="text-sm font-semibold text-white">Pick a daily budget</h3>
-                  <p className="text-xs text-hpanel-muted mt-0.5">
-                    Google recommends three starting points based on industry averages.
-                  </p>
-                </div>
-              </div>
-              <BudgetRecommendations
-                recommendations={recommendations}
-                selectedBudget={draft.dailyBudget}
-                onSelect={(b) => setDraft({ ...draft, dailyBudget: b })}
-              />
-            </div>
-
-            <div className="mt-6">
-              <div className="flex items-end justify-between mb-3">
-                <label className="text-sm font-medium text-white">Or set a custom daily budget</label>
+                <label className="text-sm font-medium text-white">Daily budget</label>
                 <span className="text-2xl font-semibold text-white tabular-nums">
                   ${draft.dailyBudget}
                   <span className="text-sm text-hpanel-muted font-normal"> / day</span>
@@ -440,11 +416,7 @@ export function CreateCampaign() {
               </>
             }
           >
-            <ReviewSummary
-              campaignName={campaignName}
-              draft={draft}
-              estimatedLeads={estimateLeads(draft.dailyBudget)}
-            />
+            <ReviewSummary campaignName={campaignName} draft={draft} />
 
             <div className="mt-5 rounded-card border border-hpanel-primary/30 bg-hpanel-primary-soft p-4">
               <div className="flex items-start gap-3">
