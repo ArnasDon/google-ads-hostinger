@@ -36,6 +36,7 @@ const seededDefaults = {
   language: 'English',
   euPoliticalAdsStatus: 'DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING',
   conversionTracking: { type: 'WEBPAGE', eventName: 'lead_form_submit' },
+  reviewStatus: 'APPROVED',
 } satisfies Partial<Campaign>
 
 export const dummyCampaigns: Record<string, Campaign[]> = {

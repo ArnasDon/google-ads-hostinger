@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { CreditCard, ImageIcon, Pause, Target } from 'lucide-react'
+import { CreditCard, ImageIcon, ShieldCheck, Target } from 'lucide-react'
 import { Breadcrumbs } from '../components/ui/Breadcrumbs'
 import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
@@ -177,11 +177,16 @@ export function CreateCampaign() {
       language: draft.language,
       euPoliticalAdsStatus: draft.euPoliticalAdsStatus,
       conversionTracking: draft.conversionTracking ?? undefined,
+      // Drafts stay local, no review yet. Submitted campaigns flow through
+      // Google's policy review before they can serve.
+      reviewStatus: asDraft ? undefined : 'UNDER_REVIEW',
     }
     addCampaign(account.id, newCampaign)
     setSubmitting(false)
     showToast(
-      asDraft ? 'Campaign draft saved.' : 'Campaign created in paused mode.',
+      asDraft
+        ? 'Campaign draft saved.'
+        : 'Campaign sent to Google for review.',
       'success'
     )
     navigate(`/marketing/google-ads/accounts/${account.id}`)
@@ -440,11 +445,11 @@ export function CreateCampaign() {
 
             <div className="mt-5 rounded-card border border-hpanel-primary/30 bg-hpanel-primary-soft p-4">
               <div className="flex items-start gap-3">
-                <Pause size={18} className="text-hpanel-primary-hover mt-0.5 flex-shrink-0" aria-hidden />
+                <ShieldCheck size={18} className="text-hpanel-primary-hover mt-0.5 flex-shrink-0" aria-hidden />
                 <div className="text-sm">
-                  <div className="text-white font-medium">Your campaign will start in paused mode.</div>
-                  <p className="text-hpanel-muted text-xs mt-0.5">
-                    Review it once more on the campaign details page, then activate when ready.
+                  <div className="text-white font-medium">Google will review your campaign before it can run</div>
+                  <p className="text-hpanel-muted text-xs mt-1.5">
+                    Most campaigns are reviewed within one business day. Google checks your headlines, descriptions, destination URL, and any images or video against its policies. Once approved, your ad goes live automatically — no further action needed from you.
                   </p>
                 </div>
               </div>
