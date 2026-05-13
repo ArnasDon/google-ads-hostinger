@@ -2,9 +2,14 @@ import { createContext, useCallback, useContext, useMemo, useState, type ReactNo
 import { dummyCampaigns, PRIMARY_ACCOUNT_ID } from '../data/dummy'
 import type { Campaign, CampaignStatus } from '../types'
 
+export type ConnectPhase = 'idle' | 'authorizing' | 'creating' | 'linking-mcc' | 'fetching'
+
 interface ConnectionContextValue {
   isConnected: boolean
   isConnecting: boolean
+  /** Sub-stage of the connect flow — drives the loader label so users see
+   *  what's happening rather than a generic spinner. */
+  connectPhase: ConnectPhase
   isNewUser: boolean
   /** Google account that was authorized — every Ads account on the workspace
    *  is mapped to this email per the OAuth scope. */
@@ -50,6 +55,7 @@ const ConnectionContext = createContext<ConnectionContextValue | null>(null)
 export function ConnectionProvider({ children }: { children: ReactNode }) {
   const [isConnected, setIsConnected] = useState(false)
   const [isConnecting, setIsConnecting] = useState(false)
+  const [connectPhase, setConnectPhase] = useState<ConnectPhase>('idle')
   const [isNewUser, setIsNewUser] = useState(false)
   const [googleAccountEmail, setGoogleAccountEmail] = useState<string | null>(null)
   const [billingSetupCompleted, setBillingSetupCompleted] = useState(false)
@@ -62,14 +68,24 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
   const connect = useCallback(async (newUser: boolean) => {
     setIsConnecting(true)
     setAuthCancelled(false)
-    // New users wait ~2s while we "create" their Google Ads account (mirroring
-    // CustomerService.CreateCustomerClient); existing users get a faster
-    // ListAccessibleCustomers-style fetch.
-    await new Promise((resolve) => setTimeout(resolve, newUser ? 2000 : 1200))
+
     if (newUser) {
+      // New users walk through three visible sub-stages so the loader copy
+      // reflects what's actually happening server-side — the OAuth modal
+      // reads connectPhase to label the spinner.
+      setConnectPhase('authorizing')
+      await new Promise((resolve) => setTimeout(resolve, 700))
+      setConnectPhase('creating')
+      await new Promise((resolve) => setTimeout(resolve, 800))
+      setConnectPhase('linking-mcc')
+      await new Promise((resolve) => setTimeout(resolve, 600))
       // Freshly created account has no campaigns yet.
       setCampaignsByAccount((prev) => ({ ...prev, [PRIMARY_ACCOUNT_ID]: [] }))
+    } else {
+      setConnectPhase('fetching')
+      await new Promise((resolve) => setTimeout(resolve, 1200))
     }
+
     // New users still need to add a payment method + accept the Google Ads
     // invitation; existing users already have billing set up.
     setBillingSetupCompleted(!newUser)
@@ -81,6 +97,7 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
     setCreditBannerDismissed(false)
     setIsConnected(true)
     setIsConnecting(false)
+    setConnectPhase('idle')
   }, [])
 
   const dismissCreditBanner = useCallback(() => setCreditBannerDismissed(true), [])
@@ -95,6 +112,7 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
   const disconnect = useCallback(() => {
     setIsConnected(false)
     setIsConnecting(false)
+    setConnectPhase('idle')
     setIsNewUser(false)
     setGoogleAccountEmail(null)
     setBillingSetupCompleted(false)
@@ -110,6 +128,7 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
 
   const cancelAuth = useCallback(() => {
     setIsConnecting(false)
+    setConnectPhase('idle')
     setAuthCancelled(true)
   }, [])
 
@@ -173,6 +192,7 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
     () => ({
       isConnected,
       isConnecting,
+      connectPhase,
       isNewUser,
       googleAccountEmail,
       billingSetupCompleted,
@@ -198,6 +218,7 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
     [
       isConnected,
       isConnecting,
+      connectPhase,
       isNewUser,
       googleAccountEmail,
       billingSetupCompleted,

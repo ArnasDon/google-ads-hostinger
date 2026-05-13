@@ -4,6 +4,15 @@ import { Modal } from '../ui/Modal'
 import { Button } from '../ui/Button'
 import { RadioGroup, RadioOption } from '../ui/RadioGroup'
 import { GoogleLogo } from './GoogleLogo'
+import { useConnection, type ConnectPhase } from '../../context/ConnectionContext'
+
+const phaseLabels: Record<ConnectPhase, string> = {
+  idle: 'Allow',
+  authorizing: 'Connecting to Google…',
+  creating: 'Creating Google Ads account…',
+  'linking-mcc': 'Linking to Hostinger manager account…',
+  fetching: 'Fetching account…',
+}
 
 interface OAuthModalProps {
   open: boolean
@@ -22,6 +31,7 @@ type UserKind = 'existing' | 'new'
 
 export function OAuthModal({ open, onCancel, onAllow, loading }: OAuthModalProps) {
   const [userKind, setUserKind] = useState<UserKind | null>(null)
+  const { connectPhase } = useConnection()
 
   useEffect(() => {
     if (!open) setUserKind(null)
@@ -105,11 +115,7 @@ export function OAuthModal({ open, onCancel, onAllow, loading }: OAuthModalProps
             loading={loading}
             disabled={!userKind}
           >
-            {loading
-              ? userKind === 'new'
-                ? 'Creating account…'
-                : 'Fetching account…'
-              : 'Allow'}
+            {loading ? phaseLabels[connectPhase] : 'Allow'}
           </Button>
         </div>
       </div>
