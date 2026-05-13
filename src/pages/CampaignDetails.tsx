@@ -5,7 +5,6 @@ import { Button } from '../components/ui/Button'
 import { Badge } from '../components/ui/Badge'
 import { MetricCard } from '../components/google-ads/MetricCard'
 import { PerformanceChart } from '../components/google-ads/PerformanceChart'
-import { AssetGroupCard } from '../components/google-ads/AssetGroupCard'
 import { RecommendationsCard } from '../components/google-ads/RecommendationsCard'
 import { EditCampaignDrawer } from '../components/google-ads/EditCampaignDrawer'
 import { dummyAccounts, dummyChart } from '../data/dummy'
@@ -35,12 +34,6 @@ export function CampaignDetails() {
       </div>
     )
   }
-
-  const headlines = campaign.headlines ?? [
-    'Fast & Reliable Web Hosting',
-    'Get Online in Minutes',
-    'Free Domain Included',
-  ]
 
   const toggleStatus = () => {
     const next = campaign.status === 'Active' ? 'Paused' : 'Active'
@@ -100,10 +93,7 @@ export function CampaignDetails() {
         <PerformanceChart data={dummyChart} />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <AssetGroupCard name="Main asset group" adStrength="Good" headlines={headlines} />
-        <RecommendationsCard />
-      </div>
+      <RecommendationsCard />
 
       <EditCampaignDrawer
         open={editOpen}
