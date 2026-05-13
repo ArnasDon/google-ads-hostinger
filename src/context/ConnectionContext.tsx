@@ -20,6 +20,7 @@ interface ConnectionContextValue {
   updateCampaignStatus: (accountId: string, campaignId: string, status: CampaignStatus) => void
   updateCampaign: (accountId: string, campaignId: string, patch: Partial<Campaign>) => void
   approveReview: (accountId: string, campaignId: string) => void
+  removeCampaign: (accountId: string, campaignId: string) => void
 }
 
 // Demo email — in production we'd read this from the OAuth `id_token` claims.
@@ -107,6 +108,16 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
     }))
   }, [])
 
+  // Real Google Ads sets status=REMOVED (soft delete, still queryable in
+  // historical reports). The demo just drops it from the in-memory list —
+  // we don't surface a "Removed" tab.
+  const removeCampaign = useCallback((accountId: string, campaignId: string) => {
+    setCampaignsByAccount((prev) => ({
+      ...prev,
+      [accountId]: (prev[accountId] ?? []).filter((c) => c.id !== campaignId),
+    }))
+  }, [])
+
   const value = useMemo<ConnectionContextValue>(
     () => ({
       isConnected,
@@ -124,6 +135,7 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
       updateCampaignStatus,
       updateCampaign,
       approveReview,
+      removeCampaign,
     }),
     [
       isConnected,
@@ -141,6 +153,7 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
       updateCampaignStatus,
       updateCampaign,
       approveReview,
+      removeCampaign,
     ]
   )
 

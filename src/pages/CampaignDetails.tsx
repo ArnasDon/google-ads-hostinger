@@ -1,8 +1,10 @@
-import { lazy, Suspense, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { MoreVertical, Trash2 } from 'lucide-react'
 import { Breadcrumbs } from '../components/ui/Breadcrumbs'
 import { Button } from '../components/ui/Button'
 import { Badge } from '../components/ui/Badge'
+import { Modal } from '../components/ui/Modal'
 import { MetricCard } from '../components/google-ads/MetricCard'
 import { EditCampaignDrawer } from '../components/google-ads/EditCampaignDrawer'
 import { ReviewStatusBanner, reviewStatusLabel, reviewStatusTone } from '../components/google-ads/ReviewStatusBanner'
@@ -17,9 +19,22 @@ import { useToast } from '../context/ToastContext'
 export function CampaignDetails() {
   const { id = '', campaignId = '' } = useParams<{ id: string; campaignId: string }>()
   const navigate = useNavigate()
-  const { campaignsByAccount, updateCampaignStatus, updateCampaign } = useConnection()
+  const { campaignsByAccount, updateCampaignStatus, updateCampaign, removeCampaign } = useConnection()
   const { showToast } = useToast()
   const [editOpen, setEditOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [confirmRemoveOpen, setConfirmRemoveOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  // Close the kebab menu when clicking outside.
+  useEffect(() => {
+    if (!menuOpen) return
+    const onClick = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false)
+    }
+    document.addEventListener('mousedown', onClick)
+    return () => document.removeEventListener('mousedown', onClick)
+  }, [menuOpen])
 
   const account = dummyAccounts.find((a) => a.id === id)
   const campaign = (campaignsByAccount[id] ?? []).find((c) => c.id === campaignId)
@@ -81,6 +96,36 @@ export function CampaignDetails() {
           <Button variant="secondary" onClick={() => setEditOpen(true)}>
             Edit settings
           </Button>
+          <div ref={menuRef} className="relative">
+            <button
+              type="button"
+              onClick={() => setMenuOpen((v) => !v)}
+              aria-label="More campaign actions"
+              aria-haspopup="menu"
+              aria-expanded={menuOpen}
+              className="h-10 w-10 inline-flex items-center justify-center rounded-card border border-hpanel-border-strong text-hpanel-muted hover:text-white hover:bg-white/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hpanel-primary"
+            >
+              <MoreVertical size={16} />
+            </button>
+            {menuOpen && (
+              <div
+                role="menu"
+                className="absolute right-0 top-11 z-10 min-w-[180px] rounded-card border border-hpanel-border bg-hpanel-surface shadow-card py-1"
+              >
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    setMenuOpen(false)
+                    setConfirmRemoveOpen(true)
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-hpanel-danger hover:bg-white/5 transition"
+                >
+                  <Trash2 size={14} /> Remove campaign
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -115,6 +160,43 @@ export function CampaignDetails() {
         onClose={() => setEditOpen(false)}
         onSave={(patch) => updateCampaign(id, campaignId, patch)}
       />
+
+      <Modal
+        open={confirmRemoveOpen}
+        onClose={() => setConfirmRemoveOpen(false)}
+        titleId="remove-campaign-title"
+      >
+        <div className="p-6">
+          <div className="flex items-start gap-3">
+            <div className="h-10 w-10 flex-shrink-0 rounded-card bg-hpanel-danger/15 flex items-center justify-center text-hpanel-danger">
+              <Trash2 size={20} aria-hidden />
+            </div>
+            <div className="flex-1">
+              <h2 id="remove-campaign-title" className="text-base font-semibold text-white">
+                Remove this campaign?
+              </h2>
+              <p className="text-sm text-hpanel-muted mt-1.5">
+                <span className="text-white font-medium">{campaign.name}</span> will stop running immediately and will be removed from your account. This can't be undone from hPanel.
+              </p>
+            </div>
+          </div>
+          <div className="mt-6 flex items-center justify-end gap-2">
+            <Button variant="secondary" onClick={() => setConfirmRemoveOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              onClick={() => {
+                removeCampaign(id, campaignId)
+                showToast(`Campaign "${campaign.name}" removed.`, 'info')
+                navigate(`/marketing/google-ads/accounts/${id}`)
+              }}
+            >
+              Remove campaign
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }
