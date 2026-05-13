@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { AlertOctagon, LinkIcon, MoreVertical, ShieldCheck, Unlink } from 'lucide-react'
+import { AlertOctagon, LinkIcon, MoreVertical, Network, ShieldCheck, Unlink } from 'lucide-react'
 import { Breadcrumbs } from '../components/ui/Breadcrumbs'
 import { Badge } from '../components/ui/Badge'
 import { Button } from '../components/ui/Button'
@@ -76,9 +76,15 @@ export function AccountCampaigns() {
 
       <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
         <div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-2xl font-semibold text-white">{account.name}</h1>
             <Badge tone={statusTone}>{effectiveStatus}</Badge>
+            <span
+              className="inline-flex items-center gap-1 rounded-full bg-hpanel-primary-soft border border-hpanel-primary/30 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-hpanel-primary-hover"
+              title="This Google Ads account is linked to the Hostinger manager account (MCC) for attribution, performance auditing, and shared reporting. Disconnecting removes the link."
+            >
+              <Network size={10} aria-hidden /> Managed by Hostinger
+            </span>
           </div>
           <p className="text-sm text-hpanel-muted mt-1 font-mono">Account ID: {account.externalId}</p>
           {googleAccountEmail && (
