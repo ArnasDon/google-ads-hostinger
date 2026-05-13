@@ -71,14 +71,3 @@ export interface ChartPoint {
   clicks: number
   conversions: number
 }
-
-export type BudgetTier = 'conservative' | 'recommended' | 'aggressive'
-
-export interface BudgetRecommendation {
-  tier: BudgetTier
-  dailyBudget: number
-  weeklyImpressions: number
-  weeklyClicks: number
-  weeklyLeadsLow: number
-  weeklyLeadsHigh: number
-}
