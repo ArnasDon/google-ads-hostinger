@@ -5,7 +5,6 @@ import { Button } from '../components/ui/Button'
 import { Badge } from '../components/ui/Badge'
 import { MetricCard } from '../components/google-ads/MetricCard'
 import { PerformanceChart } from '../components/google-ads/PerformanceChart'
-import { RecommendationsCard } from '../components/google-ads/RecommendationsCard'
 import { EditCampaignDrawer } from '../components/google-ads/EditCampaignDrawer'
 import { dummyAccounts, dummyChart } from '../data/dummy'
 import { useConnection } from '../context/ConnectionContext'
@@ -92,8 +91,6 @@ export function CampaignDetails() {
         </div>
         <PerformanceChart data={dummyChart} />
       </div>
-
-      <RecommendationsCard />
 
       <EditCampaignDrawer
         open={editOpen}
