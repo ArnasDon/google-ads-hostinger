@@ -9,6 +9,10 @@ interface ConnectionContextValue {
   /** Google account that was authorized — every Ads account on the workspace
    *  is mapped to this email per the OAuth scope. */
   googleAccountEmail: string | null
+  /** Whether the user has finished the billing-setup step inside Google Ads
+   *  (payment method + invitation acceptance). Real implementations track this
+   *  via the GAFE return state; existing users start `true`, new users `false`. */
+  billingSetupCompleted: boolean
   creditBannerDismissed: boolean
   authCancelled: boolean
   connect: (isNewUser: boolean) => Promise<void>
@@ -24,6 +28,7 @@ interface ConnectionContextValue {
   updateCampaign: (accountId: string, campaignId: string, patch: Partial<Campaign>) => void
   approveReview: (accountId: string, campaignId: string) => void
   removeCampaign: (accountId: string, campaignId: string) => void
+  completeBillingSetup: () => void
 }
 
 // Demo email — in production we'd read this from the OAuth `id_token` claims.
@@ -36,6 +41,7 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
   const [isConnecting, setIsConnecting] = useState(false)
   const [isNewUser, setIsNewUser] = useState(false)
   const [googleAccountEmail, setGoogleAccountEmail] = useState<string | null>(null)
+  const [billingSetupCompleted, setBillingSetupCompleted] = useState(false)
   const [creditBannerDismissed, setCreditBannerDismissed] = useState(false)
   const [authCancelled, setAuthCancelled] = useState(false)
   const [campaignsByAccount, setCampaignsByAccount] = useState<Record<string, Campaign[]>>(dummyCampaigns)
@@ -51,6 +57,9 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
       // Freshly created account has no campaigns yet.
       setCampaignsByAccount((prev) => ({ ...prev, [PRIMARY_ACCOUNT_ID]: [] }))
     }
+    // New users still need to add a payment method + accept the Google Ads
+    // invitation; existing users already have billing set up.
+    setBillingSetupCompleted(!newUser)
     setIsNewUser(newUser)
     setGoogleAccountEmail(DEMO_GOOGLE_EMAIL)
     setCreditBannerDismissed(false)
@@ -59,12 +68,14 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const dismissCreditBanner = useCallback(() => setCreditBannerDismissed(true), [])
+  const completeBillingSetup = useCallback(() => setBillingSetupCompleted(true), [])
 
   const disconnect = useCallback(() => {
     setIsConnected(false)
     setIsConnecting(false)
     setIsNewUser(false)
     setGoogleAccountEmail(null)
+    setBillingSetupCompleted(false)
     setCreditBannerDismissed(false)
     setAuthCancelled(false)
     // Restore seed campaigns so re-connecting as an existing user goes back
@@ -140,6 +151,7 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
       isConnecting,
       isNewUser,
       googleAccountEmail,
+      billingSetupCompleted,
       creditBannerDismissed,
       authCancelled,
       connect,
@@ -153,12 +165,14 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
       updateCampaign,
       approveReview,
       removeCampaign,
+      completeBillingSetup,
     }),
     [
       isConnected,
       isConnecting,
       isNewUser,
       googleAccountEmail,
+      billingSetupCompleted,
       creditBannerDismissed,
       authCancelled,
       connect,
@@ -172,6 +186,7 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
       updateCampaign,
       approveReview,
       removeCampaign,
+      completeBillingSetup,
     ]
   )
 
