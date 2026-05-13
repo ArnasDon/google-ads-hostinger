@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
-import { Copy, Globe, Phone } from 'lucide-react'
+import { CheckCircle2, ChevronDown, ChevronRight, Copy, Globe, Phone, Zap } from 'lucide-react'
 import { RadioGroup, RadioOption } from '../ui/RadioGroup'
 import type { ConversionTrackingConfig, ConversionType } from '../../types'
 import { Input } from '../ui/Input'
 import { Button } from '../ui/Button'
+import { useConnection } from '../../context/ConnectionContext'
 import { useToast } from '../../context/ToastContext'
 
 interface ConversionTrackingProps {
@@ -34,8 +35,12 @@ function buildWebpageSnippet(eventName: string): string {
 export function ConversionTracking({ value, onChange, error }: ConversionTrackingProps) {
   const [type, setType] = useState<ConversionType>(value?.type ?? 'WEBPAGE')
   const [eventName, setEventName] = useState(value?.eventName ?? 'lead_form_submit')
+  const [successUrl, setSuccessUrl] = useState(value?.successUrl ?? '')
   const [phoneNumber, setPhoneNumber] = useState(value?.phoneNumber ?? '')
   const [minDuration, setMinDuration] = useState(value?.minDurationSeconds ?? 60)
+  const [snippetExpanded, setSnippetExpanded] = useState(false)
+  const [deploying, setDeploying] = useState(false)
+  const { googleTagDeployed, deployGoogleTag } = useConnection()
   const { showToast } = useToast()
 
   const snippet = useMemo(() => buildWebpageSnippet(eventName), [eventName])
@@ -47,14 +52,18 @@ export function ConversionTracking({ value, onChange, error }: ConversionTrackin
   useEffect(() => {
     const next: ConversionTrackingConfig =
       type === 'WEBPAGE'
-        ? { type: 'WEBPAGE', eventName: eventName.trim() || 'conversion' }
+        ? {
+            type: 'WEBPAGE',
+            eventName: eventName.trim() || 'conversion',
+            successUrl: successUrl.trim() || undefined,
+          }
         : {
             type: 'CLICK_TO_CALL',
             phoneNumber: phoneNumber.trim(),
             minDurationSeconds: minDuration,
           }
     onChange(next)
-  }, [type, eventName, phoneNumber, minDuration, onChange])
+  }, [type, eventName, successUrl, phoneNumber, minDuration, onChange])
 
   const selectType = (t: ConversionType) => setType(t)
 
@@ -120,19 +129,75 @@ export function ConversionTracking({ value, onChange, error }: ConversionTrackin
             maxLength={50}
           />
 
+          <Input
+            label="Success / thank-you URL (optional)"
+            hint="The page users land on after submitting a form or completing a purchase. Google Ads uses it to verify the conversion."
+            placeholder="https://yourdomain.com/thank-you"
+            type="url"
+            value={successUrl}
+            onChange={(e) => setSuccessUrl(e.target.value)}
+          />
+
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-medium text-white">Code snippet</label>
-              <Button size="sm" variant="secondary" onClick={copy} leftIcon={<Copy size={14} aria-hidden />}>
-                Copy snippet
-              </Button>
-            </div>
-            <pre className="bg-hpanel-bg border border-hpanel-border-strong rounded-card p-3 text-xs text-hpanel-muted overflow-x-auto whitespace-pre-wrap font-mono leading-relaxed">
-              {snippet}
-            </pre>
-            <p className="mt-2 text-xs text-hpanel-muted">
-              Add the global tag to every page and fire the event snippet on the conversion success page. Replace <code className="text-white bg-white/5 px-1 rounded">AW-XXXXXXXXX</code> with the ID Google gives you after creation.
-            </p>
+            <label className="text-sm font-medium text-white mb-2 block">Install Google Tag on your site</label>
+            {googleTagDeployed ? (
+              <div className="rounded-card border border-hpanel-success/40 bg-hpanel-success/10 px-3 py-2.5 flex items-center gap-2 text-sm text-white">
+                <CheckCircle2 size={16} className="text-hpanel-success flex-shrink-0" aria-hidden />
+                <span>Google Tag is deployed on <span className="font-mono text-hpanel-success">yourdomain.com</span>. Conversions will fire automatically.</span>
+              </div>
+            ) : (
+              <div className="rounded-card border border-hpanel-primary/40 bg-hpanel-primary-soft p-3">
+                <div className="flex items-start gap-2.5">
+                  <Zap size={16} className="text-hpanel-primary-hover mt-0.5 flex-shrink-0" aria-hidden />
+                  <div className="flex-1">
+                    <p className="text-sm text-white font-medium">Deploy automatically to your Hostinger site</p>
+                    <p className="text-xs text-hpanel-muted mt-0.5">
+                      We can install the Google Tag on every page of <span className="font-mono text-white">yourdomain.com</span> for you — no copy/paste needed.
+                    </p>
+                    <Button
+                      size="sm"
+                      className="mt-2.5"
+                      loading={deploying}
+                      onClick={async () => {
+                        setDeploying(true)
+                        await deployGoogleTag()
+                        setDeploying(false)
+                        showToast('Google Tag deployed to yourdomain.com.', 'success')
+                      }}
+                      leftIcon={!deploying ? <Zap size={14} aria-hidden /> : undefined}
+                    >
+                      {deploying ? 'Deploying…' : 'Deploy Google Tag'}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={() => setSnippetExpanded((v) => !v)}
+              aria-expanded={snippetExpanded}
+              className="mt-3 inline-flex items-center gap-1 text-xs text-hpanel-muted hover:text-white transition"
+            >
+              {snippetExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+              {snippetExpanded ? 'Hide manual snippet' : 'Show manual install snippet'}
+            </button>
+
+            {snippetExpanded && (
+              <div className="mt-2">
+                <div className="flex items-center justify-end mb-2">
+                  <Button size="sm" variant="secondary" onClick={copy} leftIcon={<Copy size={14} aria-hidden />}>
+                    Copy snippet
+                  </Button>
+                </div>
+                <pre className="bg-hpanel-bg border border-hpanel-border-strong rounded-card p-3 text-xs text-hpanel-muted overflow-x-auto whitespace-pre-wrap font-mono leading-relaxed">
+                  {snippet}
+                </pre>
+                <p className="mt-2 text-xs text-hpanel-muted">
+                  Only needed if you're managing the site outside Hostinger. Add the global tag to every page and fire the event snippet on the conversion success page.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       )}
