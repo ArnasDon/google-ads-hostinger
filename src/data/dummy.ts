@@ -27,33 +27,20 @@ export function estimateLeadsForBudget(dailyBudget: number) {
 }
 
 
+// V1 model: one user → one Google Ads account. The OAuth flow either
+// surfaces this existing account or simulates creating it for a new user.
+// Multi-account (MCC / agency) support is intentionally out of scope.
+export const PRIMARY_ACCOUNT_ID = 'acc-1'
+
 export const dummyAccounts: Account[] = [
   {
-    id: 'acc-1',
+    id: PRIMARY_ACCOUNT_ID,
     name: 'Hostinger Main Account',
     externalId: '123-456-7890',
     status: 'Active',
     activeCampaigns: 3,
     spend: 1245,
     conversions: 142,
-  },
-  {
-    id: 'acc-2',
-    name: 'Client A – E-commerce',
-    externalId: '987-654-3210',
-    status: 'Active',
-    activeCampaigns: 1,
-    spend: 450,
-    conversions: 28,
-  },
-  {
-    id: 'acc-3',
-    name: 'Legacy Campaigns',
-    externalId: '555-123-4567',
-    status: 'Inactive',
-    activeCampaigns: 0,
-    spend: 0,
-    conversions: 0,
   },
 ]
 
@@ -111,21 +98,6 @@ export const dummyCampaigns: Record<string, Campaign[]> = {
       ...seededDefaults,
     },
   ],
-  'acc-2': [
-    {
-      id: 'cmp-4',
-      name: 'Holiday Promo – Performance Max',
-      type: 'Performance Max',
-      status: 'Active',
-      dailyBudget: 30,
-      impressions: 22000,
-      clicks: 180,
-      conversions: 12,
-      cost: 62.4,
-      ...seededDefaults,
-    },
-  ],
-  'acc-3': [],
 }
 
 export const dummyChart: ChartPoint[] = [

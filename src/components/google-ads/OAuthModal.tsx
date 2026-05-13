@@ -83,7 +83,11 @@ export function OAuthModal({ open, onCancel, onAllow, loading }: OAuthModalProps
             loading={loading}
             disabled={!userKind}
           >
-            {loading ? 'Connecting…' : 'Allow'}
+            {loading
+              ? userKind === 'new'
+                ? 'Creating account…'
+                : 'Fetching account…'
+              : 'Allow'}
           </Button>
         </div>
       </div>

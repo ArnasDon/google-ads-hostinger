@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
-import { dummyCampaigns } from '../data/dummy'
+import { dummyCampaigns, PRIMARY_ACCOUNT_ID } from '../data/dummy'
 import type { Campaign, CampaignStatus } from '../types'
 
 interface ConnectionContextValue {
@@ -31,7 +31,14 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
   const connect = useCallback(async (newUser: boolean) => {
     setIsConnecting(true)
     setAuthCancelled(false)
-    await new Promise((resolve) => setTimeout(resolve, 1200))
+    // New users wait ~2s while we "create" their Google Ads account (mirroring
+    // CustomerService.CreateCustomerClient); existing users get a faster
+    // ListAccessibleCustomers-style fetch.
+    await new Promise((resolve) => setTimeout(resolve, newUser ? 2000 : 1200))
+    if (newUser) {
+      // Freshly created account has no campaigns yet.
+      setCampaignsByAccount((prev) => ({ ...prev, [PRIMARY_ACCOUNT_ID]: [] }))
+    }
     setIsNewUser(newUser)
     setCreditBannerDismissed(false)
     setIsConnected(true)
