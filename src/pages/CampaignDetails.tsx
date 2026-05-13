@@ -5,6 +5,7 @@ import { Button } from '../components/ui/Button'
 import { Badge } from '../components/ui/Badge'
 import { MetricCard } from '../components/google-ads/MetricCard'
 import { EditCampaignDrawer } from '../components/google-ads/EditCampaignDrawer'
+import { ReviewStatusBanner, reviewStatusLabel, reviewStatusTone } from '../components/google-ads/ReviewStatusBanner'
 
 // recharts is ~150 KB minified — lazy-load it so the rest of the app
 // (landing, account list, wizard, edit drawer) doesn't pay the cost.
@@ -55,10 +56,15 @@ export function CampaignDetails() {
       <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-semibold text-white">{campaign.name}</h1>
-          <div className="flex items-center gap-2 mt-2">
+          <div className="flex flex-wrap items-center gap-2 mt-2">
             <Badge tone={campaign.status === 'Active' ? 'success' : campaign.status === 'Paused' ? 'warning' : 'info'}>
               {campaign.status}
             </Badge>
+            {campaign.reviewStatus && campaign.reviewStatus !== 'APPROVED' && (
+              <Badge tone={reviewStatusTone(campaign.reviewStatus)}>
+                {reviewStatusLabel(campaign.reviewStatus)}
+              </Badge>
+            )}
             <span className="text-xs text-hpanel-muted">{campaign.type} campaign</span>
           </div>
         </div>
@@ -77,6 +83,8 @@ export function CampaignDetails() {
           </Button>
         </div>
       </div>
+
+      <ReviewStatusBanner accountId={id} campaign={campaign} />
 
       <div className="grid gap-4 md:grid-cols-4 mb-6">
         <MetricCard label="Impressions" value={campaign.impressions.toLocaleString()} delta={12.3} />

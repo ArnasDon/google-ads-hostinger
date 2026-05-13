@@ -16,6 +16,7 @@ interface ConnectionContextValue {
   addCampaign: (accountId: string, campaign: Campaign) => void
   updateCampaignStatus: (accountId: string, campaignId: string, status: CampaignStatus) => void
   updateCampaign: (accountId: string, campaignId: string, patch: Partial<Campaign>) => void
+  approveReview: (accountId: string, campaignId: string) => void
 }
 
 const ConnectionContext = createContext<ConnectionContextValue | null>(null)
@@ -85,6 +86,19 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
     []
   )
 
+  // Demo helper — flips an under-review campaign to APPROVED, simulating
+  // Google's async review completing. In real Google Ads this transition is
+  // server-side; the UI just reflects whatever PolicyApprovalStatus the API
+  // returns on the next campaign fetch.
+  const approveReview = useCallback((accountId: string, campaignId: string) => {
+    setCampaignsByAccount((prev) => ({
+      ...prev,
+      [accountId]: (prev[accountId] ?? []).map((c) =>
+        c.id === campaignId ? { ...c, reviewStatus: 'APPROVED' } : c
+      ),
+    }))
+  }, [])
+
   const value = useMemo<ConnectionContextValue>(
     () => ({
       isConnected,
@@ -100,6 +114,7 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
       addCampaign,
       updateCampaignStatus,
       updateCampaign,
+      approveReview,
     }),
     [
       isConnected,
@@ -115,6 +130,7 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
       addCampaign,
       updateCampaignStatus,
       updateCampaign,
+      approveReview,
     ]
   )
 

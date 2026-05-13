@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { BarChart3 } from 'lucide-react'
 import { Badge } from '../ui/Badge'
+import { reviewStatusLabel, reviewStatusTone } from './ReviewStatusBanner'
 import type { Campaign } from '../../types'
 
 interface CampaignTableProps {
@@ -63,7 +64,14 @@ export function CampaignTable({ campaigns, accountId }: CampaignTableProps) {
                   <div className="text-xs text-hpanel-muted mt-0.5">{c.type}</div>
                 </td>
                 <td className="px-4 py-3.5">
-                  <Badge tone={statusTone(c.status)}>{c.status}</Badge>
+                  <div className="flex flex-col items-start gap-1">
+                    <Badge tone={statusTone(c.status)}>{c.status}</Badge>
+                    {c.reviewStatus && c.reviewStatus !== 'APPROVED' && (
+                      <Badge tone={reviewStatusTone(c.reviewStatus)}>
+                        {reviewStatusLabel(c.reviewStatus)}
+                      </Badge>
+                    )}
+                  </div>
                 </td>
                 <td className="px-4 py-3.5 text-right tabular-nums">${c.dailyBudget}</td>
                 <td className="px-4 py-3.5 text-right tabular-nums">{c.impressions.toLocaleString()}</td>

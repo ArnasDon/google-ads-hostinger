@@ -83,8 +83,11 @@ export function EditCampaignDrawer({ open, campaign, onClose, onSave }: EditCamp
       language,
       conversionTracking: conversionTracking ?? undefined,
       euPoliticalAdsStatus: euPoliticalAdsStatus ?? undefined,
+      // Any edit to a reviewed field re-triggers Google's review per their
+      // policy. We don't track per-field dirtiness for V1, so be conservative.
+      reviewStatus: 'UNDER_REVIEW',
     })
-    showToast('Campaign settings updated', 'success')
+    showToast('Changes saved. Campaign sent back to Google for review.', 'success')
     onClose()
   }
 
@@ -215,9 +218,14 @@ export function EditCampaignDrawer({ open, campaign, onClose, onSave }: EditCamp
         </Section>
       </div>
 
-      <div className="flex items-center justify-end gap-2 border-t border-hpanel-border p-4">
-        <Button variant="secondary" onClick={onClose}>Cancel</Button>
-        <Button onClick={handleSave}>Save changes</Button>
+      <div className="border-t border-hpanel-border bg-hpanel-bg/40">
+        <p className="px-5 py-3 text-xs text-hpanel-muted">
+          <span className="text-white font-medium">Heads up:</span> saving changes will pause the campaign while Google re-reviews it. Most reviews finish within one business day.
+        </p>
+        <div className="flex items-center justify-end gap-2 border-t border-hpanel-border p-4">
+          <Button variant="secondary" onClick={onClose}>Cancel</Button>
+          <Button onClick={handleSave}>Save changes</Button>
+        </div>
       </div>
     </Modal>
   )
