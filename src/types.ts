@@ -26,6 +26,10 @@ export interface ConversionTrackingConfig {
   type: ConversionType
   /** For WEBPAGE — short slug e.g. "lead_form_submit". */
   eventName?: string
+  /** For WEBPAGE — destination URL Google Ads uses to verify the conversion
+   *  (the "thank-you" / success page the user lands on after submitting a
+   *  form, completing a checkout, etc.). */
+  successUrl?: string
   /** For CLICK_TO_CALL — phone number to attribute. */
   phoneNumber?: string
   /** For CLICK_TO_CALL — call must last this many seconds to count as a conversion. */

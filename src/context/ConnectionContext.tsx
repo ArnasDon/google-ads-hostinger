@@ -16,6 +16,10 @@ interface ConnectionContextValue {
   /** Demo-only suspension flag for the primary account. When true, campaigns
    *  are blocked from serving and the appeal CTA is surfaced. */
   accountSuspended: boolean
+  /** Whether the Google Tag (gtag.js global snippet) has been installed on
+   *  the user's Hostinger site. One-time, site-wide — once installed, every
+   *  conversion action on the account fires through it. */
+  googleTagDeployed: boolean
   creditBannerDismissed: boolean
   authCancelled: boolean
   connect: (isNewUser: boolean) => Promise<void>
@@ -33,6 +37,9 @@ interface ConnectionContextValue {
   removeCampaign: (accountId: string, campaignId: string) => void
   completeBillingSetup: () => void
   setAccountSuspended: (suspended: boolean) => void
+  /** Simulates running the Google Tag installer against the user's site —
+   *  resolves after ~1.5s and flips `googleTagDeployed` to true. */
+  deployGoogleTag: () => Promise<void>
 }
 
 // Demo email — in production we'd read this from the OAuth `id_token` claims.
@@ -47,6 +54,7 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
   const [googleAccountEmail, setGoogleAccountEmail] = useState<string | null>(null)
   const [billingSetupCompleted, setBillingSetupCompleted] = useState(false)
   const [accountSuspended, setAccountSuspended] = useState(false)
+  const [googleTagDeployed, setGoogleTagDeployed] = useState(false)
   const [creditBannerDismissed, setCreditBannerDismissed] = useState(false)
   const [authCancelled, setAuthCancelled] = useState(false)
   const [campaignsByAccount, setCampaignsByAccount] = useState<Record<string, Campaign[]>>(dummyCampaigns)
@@ -65,6 +73,9 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
     // New users still need to add a payment method + accept the Google Ads
     // invitation; existing users already have billing set up.
     setBillingSetupCompleted(!newUser)
+    // Existing users have the Google Tag installed already; new users need
+    // to deploy it (one-time, site-wide).
+    setGoogleTagDeployed(!newUser)
     setIsNewUser(newUser)
     setGoogleAccountEmail(DEMO_GOOGLE_EMAIL)
     setCreditBannerDismissed(false)
@@ -75,6 +86,12 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
   const dismissCreditBanner = useCallback(() => setCreditBannerDismissed(true), [])
   const completeBillingSetup = useCallback(() => setBillingSetupCompleted(true), [])
 
+  const deployGoogleTag = useCallback(async () => {
+    // Simulates the Hostinger-side gtag installer hitting the user's site.
+    await new Promise((resolve) => setTimeout(resolve, 1500))
+    setGoogleTagDeployed(true)
+  }, [])
+
   const disconnect = useCallback(() => {
     setIsConnected(false)
     setIsConnecting(false)
@@ -82,6 +99,7 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
     setGoogleAccountEmail(null)
     setBillingSetupCompleted(false)
     setAccountSuspended(false)
+    setGoogleTagDeployed(false)
     setCreditBannerDismissed(false)
     setAuthCancelled(false)
     // Restore seed campaigns so re-connecting as an existing user goes back
@@ -159,6 +177,7 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
       googleAccountEmail,
       billingSetupCompleted,
       accountSuspended,
+      googleTagDeployed,
       creditBannerDismissed,
       authCancelled,
       connect,
@@ -174,6 +193,7 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
       removeCampaign,
       completeBillingSetup,
       setAccountSuspended,
+      deployGoogleTag,
     }),
     [
       isConnected,
@@ -182,6 +202,7 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
       googleAccountEmail,
       billingSetupCompleted,
       accountSuspended,
+      googleTagDeployed,
       creditBannerDismissed,
       authCancelled,
       connect,
@@ -197,6 +218,7 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
       removeCampaign,
       completeBillingSetup,
       setAccountSuspended,
+      deployGoogleTag,
     ]
   )
 

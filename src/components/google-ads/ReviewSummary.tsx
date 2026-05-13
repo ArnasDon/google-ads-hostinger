@@ -17,9 +17,18 @@ export function ReviewSummary({ campaignName, draft }: ReviewSummaryProps) {
         <Row
           label="Conversion tracking"
           value={
-            draft.conversionTracking.type === 'WEBPAGE'
-              ? `Website · "${draft.conversionTracking.eventName ?? 'conversion'}"`
-              : `Phone call · ${draft.conversionTracking.phoneNumber || '—'} (min ${draft.conversionTracking.minDurationSeconds ?? 60}s)`
+            draft.conversionTracking.type === 'WEBPAGE' ? (
+              <div>
+                <div>Website · "{draft.conversionTracking.eventName ?? 'conversion'}"</div>
+                {draft.conversionTracking.successUrl && (
+                  <div className="text-xs text-hpanel-muted font-mono break-all mt-0.5">
+                    Fires on: {draft.conversionTracking.successUrl}
+                  </div>
+                )}
+              </div>
+            ) : (
+              `Phone call · ${draft.conversionTracking.phoneNumber || '—'} (min ${draft.conversionTracking.minDurationSeconds ?? 60}s)`
+            )
           }
         />
       )}
