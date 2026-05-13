@@ -62,7 +62,11 @@ export function CampaignDetails() {
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
             <span className="text-sm text-hpanel-muted">Paused</span>
-            <ToggleSwitch checked={campaign.status === 'Active'} onChange={toggleStatus} />
+            <ToggleSwitch
+              checked={campaign.status === 'Active'}
+              onChange={toggleStatus}
+              label={`Campaign status (currently ${campaign.status})`}
+            />
             <span className="text-sm text-white font-medium">Active</span>
           </div>
           <Button variant="secondary" onClick={() => setEditOpen(true)}>
@@ -102,15 +106,24 @@ export function CampaignDetails() {
   )
 }
 
-function ToggleSwitch({ checked, onChange }: { checked: boolean; onChange: () => void }) {
+function ToggleSwitch({
+  checked,
+  onChange,
+  label,
+}: {
+  checked: boolean
+  onChange: () => void
+  label: string
+}) {
   return (
     <button
       type="button"
       onClick={onChange}
       role="switch"
       aria-checked={checked}
+      aria-label={label}
       className={[
-        'relative inline-flex h-6 w-11 rounded-full transition',
+        'relative inline-flex h-6 w-11 rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hpanel-primary focus-visible:ring-offset-2 focus-visible:ring-offset-hpanel-bg',
         checked ? 'bg-hpanel-primary' : 'bg-hpanel-border-strong',
       ].join(' ')}
     >

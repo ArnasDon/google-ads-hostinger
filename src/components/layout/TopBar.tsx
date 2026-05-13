@@ -16,17 +16,19 @@ export function TopBar({ onOpenSidebar }: TopBarProps) {
       </button>
 
       <div className="hidden md:flex items-center gap-2 flex-1 max-w-md">
-        <div className="relative w-full">
+        <label className="relative w-full">
+          <span className="sr-only">Search hPanel</span>
           <Search
             size={16}
             className="absolute left-3 top-1/2 -translate-y-1/2 text-hpanel-muted-strong pointer-events-none"
             aria-hidden
           />
           <input
+            type="search"
             placeholder="Search…"
             className="h-9 w-full pl-9 pr-3 rounded-card bg-hpanel-bg border border-hpanel-border-strong text-white text-sm placeholder:text-hpanel-muted-strong focus:outline-none focus:ring-2 focus:ring-hpanel-primary"
           />
-        </div>
+        </label>
       </div>
 
       <div className="ml-auto flex items-center gap-3">
