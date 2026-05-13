@@ -8,6 +8,20 @@ export type EuPoliticalAdsStatus =
   | 'CONTAINS_EU_POLITICAL_ADVERTISING'
   | 'DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING'
 
+// Mirrors Google Ads ConversionActionTypeEnum (subset). V1 supports at least
+// one type per the feature spec — website page-load or phone call.
+export type ConversionType = 'WEBPAGE' | 'CLICK_TO_CALL'
+
+export interface ConversionTrackingConfig {
+  type: ConversionType
+  /** For WEBPAGE — short slug e.g. "lead_form_submit". */
+  eventName?: string
+  /** For CLICK_TO_CALL — phone number to attribute. */
+  phoneNumber?: string
+  /** For CLICK_TO_CALL — call must last this many seconds to count as a conversion. */
+  minDurationSeconds?: number
+}
+
 export interface Account {
   id: string
   name: string
@@ -37,6 +51,7 @@ export interface Campaign {
   language?: string
   keywords?: string[]
   euPoliticalAdsStatus?: EuPoliticalAdsStatus
+  conversionTracking?: ConversionTrackingConfig
 }
 
 export interface CampaignDraft {
@@ -50,6 +65,7 @@ export interface CampaignDraft {
   language: string
   keywords: string[]
   euPoliticalAdsStatus: EuPoliticalAdsStatus | null
+  conversionTracking: ConversionTrackingConfig | null
 }
 
 export interface ChartPoint {
