@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { X } from 'lucide-react'
 
 interface ChipProps {
   children: ReactNode
@@ -27,10 +28,10 @@ export function Chip({ children, onRemove, onClick, variant = 'selected' }: Chip
             e.stopPropagation()
             onRemove()
           }}
-          className="ml-0.5 opacity-70 hover:opacity-100 transition"
+          className="ml-0.5 opacity-70 hover:opacity-100 transition inline-flex items-center"
           aria-label="Remove"
         >
-          ✕
+          <X size={12} />
         </button>
       )}
     </span>

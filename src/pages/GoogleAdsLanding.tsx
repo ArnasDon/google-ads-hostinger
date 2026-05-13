@@ -1,22 +1,29 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
+import { AlertTriangle, MousePointerClick, Search, Send, Sparkles, X } from 'lucide-react'
 import { Card } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 import { OAuthModal } from '../components/google-ads/OAuthModal'
 import { useConnection } from '../context/ConnectionContext'
 
-const benefits = [
+interface Benefit {
+  icon: ReactNode
+  title: string
+  description: string
+}
+
+const benefits: Benefit[] = [
   {
-    icon: '🔍',
+    icon: <Search size={22} />,
     title: 'Reach people searching for your product',
     description: 'Your ads appear when potential customers are actively searching on Google.',
   },
   {
-    icon: '💸',
+    icon: <MousePointerClick size={22} />,
     title: 'Only pay when someone clicks',
     description: 'No charges for impressions — you only pay when someone interacts with your ad.',
   },
   {
-    icon: '✨',
+    icon: <Sparkles size={22} />,
     title: 'AI optimizes your ads automatically',
     description: 'Performance Max uses Google AI to test combinations and improve results over time.',
   },
@@ -41,7 +48,7 @@ export function GoogleAdsLanding() {
     <div className="max-w-3xl mx-auto">
       {authCancelled && (
         <div className="mb-6 flex items-start gap-3 rounded-card border border-hpanel-warning/40 bg-hpanel-warning-soft px-4 py-3 text-sm">
-          <span className="text-hpanel-warning mt-0.5">⚠</span>
+          <AlertTriangle size={16} className="text-hpanel-warning mt-0.5 flex-shrink-0" aria-hidden />
           <div className="flex-1">
             <div className="font-medium text-white">Authorization cancelled</div>
             <div className="text-hpanel-muted text-xs mt-0.5">
@@ -49,16 +56,14 @@ export function GoogleAdsLanding() {
             </div>
           </div>
           <button onClick={dismissCancelled} className="text-hpanel-muted hover:text-white" aria-label="Dismiss">
-            ✕
+            <X size={16} />
           </button>
         </div>
       )}
 
       <div className="text-center">
-        <div className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-hpanel-primary-soft mb-4">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#7b66ff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M3 11l18-8-8 18-2-8-8-2z" />
-          </svg>
+        <div className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-hpanel-primary-soft mb-4 text-hpanel-primary-hover">
+          <Send size={26} aria-hidden />
         </div>
         <h1 className="text-3xl font-semibold text-white">Grow your website with Google Ads</h1>
         <p className="mt-2 text-hpanel-muted max-w-xl mx-auto">
@@ -69,7 +74,7 @@ export function GoogleAdsLanding() {
       <div className="mt-10 grid gap-4 md:grid-cols-3">
         {benefits.map((b) => (
           <Card key={b.title}>
-            <div className="text-2xl">{b.icon}</div>
+            <div className="text-hpanel-primary-hover">{b.icon}</div>
             <h3 className="mt-3 text-sm font-semibold text-white">{b.title}</h3>
             <p className="mt-1.5 text-xs text-hpanel-muted">{b.description}</p>
           </Card>

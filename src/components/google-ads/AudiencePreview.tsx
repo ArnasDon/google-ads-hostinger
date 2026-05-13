@@ -1,3 +1,5 @@
+import { Globe } from 'lucide-react'
+
 interface AudiencePreviewProps {
   businessName: string
   locations: string[]
@@ -63,7 +65,7 @@ export function AudiencePreview({ businessName, locations, language }: AudienceP
             Language
           </div>
           <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 border border-hpanel-border-strong px-2.5 py-1 text-xs text-white">
-            🌐 {language}
+            <Globe size={12} aria-hidden /> {language}
           </span>
         </div>
 

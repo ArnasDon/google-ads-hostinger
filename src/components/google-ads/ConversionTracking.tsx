@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { Copy, Globe, Phone } from 'lucide-react'
 import type { ConversionTrackingConfig, ConversionType } from '../../types'
 import { Input } from '../ui/Input'
 import { Button } from '../ui/Button'
@@ -73,14 +74,14 @@ export function ConversionTracking({ value, onChange, error }: ConversionTrackin
         <TypeOption
           selected={type === 'WEBPAGE'}
           onClick={() => selectType('WEBPAGE')}
-          icon="🌐"
+          icon={<Globe size={18} aria-hidden />}
           title="Website conversion"
           description="Count form submissions, sign-ups, or purchases on your site."
         />
         <TypeOption
           selected={type === 'CLICK_TO_CALL'}
           onClick={() => selectType('CLICK_TO_CALL')}
-          icon="📞"
+          icon={<Phone size={18} aria-hidden />}
           title="Phone call conversion"
           description="Count phone calls from people who saw your ad."
         />
@@ -105,8 +106,8 @@ export function ConversionTracking({ value, onChange, error }: ConversionTrackin
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="text-sm font-medium text-white">Code snippet</label>
-              <Button size="sm" variant="secondary" onClick={copy}>
-                📋 Copy snippet
+              <Button size="sm" variant="secondary" onClick={copy} leftIcon={<Copy size={14} aria-hidden />}>
+                Copy snippet
               </Button>
             </div>
             <pre className="bg-hpanel-bg border border-hpanel-border-strong rounded-card p-3 text-xs text-hpanel-muted overflow-x-auto whitespace-pre-wrap font-mono leading-relaxed">
@@ -153,7 +154,7 @@ function TypeOption({
 }: {
   selected: boolean
   onClick: () => void
-  icon: string
+  icon: ReactNode
   title: string
   description: string
 }) {
@@ -168,8 +169,8 @@ function TypeOption({
           : 'bg-hpanel-bg/60 border-hpanel-border-strong hover:border-hpanel-primary/50',
       ].join(' ')}
     >
-      <div className="flex items-center gap-2">
-        <span className="text-lg">{icon}</span>
+      <div className="flex items-center gap-2 text-hpanel-primary-hover">
+        {icon}
         <span className="text-sm font-semibold text-white">{title}</span>
       </div>
       <p className="text-xs text-hpanel-muted mt-1.5">{description}</p>

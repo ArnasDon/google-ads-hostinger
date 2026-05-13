@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
+import { AlertTriangle, CheckCircle2, Info, X, XCircle } from 'lucide-react'
 
 type ToastVariant = 'success' | 'info' | 'warning' | 'danger'
 
@@ -50,10 +51,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               <span className="flex-1">{t.message}</span>
               <button
                 onClick={() => dismiss(t.id)}
-                className="opacity-60 hover:opacity-100 transition"
+                className="opacity-60 hover:opacity-100 transition inline-flex items-center"
                 aria-label="Dismiss"
               >
-                ✕
+                <X size={14} />
               </button>
             </div>
           ))}
@@ -78,16 +79,16 @@ function variantClasses(v: ToastVariant) {
 }
 
 function variantIcon(v: ToastVariant) {
-  const color =
-    v === 'success'
-      ? 'text-hpanel-success'
-      : v === 'warning'
-      ? 'text-hpanel-warning'
-      : v === 'danger'
-      ? 'text-hpanel-danger'
-      : 'text-hpanel-primary'
-  const symbol = v === 'success' ? '✓' : v === 'danger' ? '!' : 'i'
-  return <span className={`inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/5 ${color} text-xs font-bold`}>{symbol}</span>
+  switch (v) {
+    case 'success':
+      return <CheckCircle2 size={18} className="text-hpanel-success" aria-hidden />
+    case 'warning':
+      return <AlertTriangle size={18} className="text-hpanel-warning" aria-hidden />
+    case 'danger':
+      return <XCircle size={18} className="text-hpanel-danger" aria-hidden />
+    default:
+      return <Info size={18} className="text-hpanel-primary-hover" aria-hidden />
+  }
 }
 
 export function useToast() {
