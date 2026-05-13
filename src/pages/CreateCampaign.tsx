@@ -14,6 +14,7 @@ import { BudgetRecommendations } from '../components/google-ads/BudgetRecommenda
 import { AdPreview } from '../components/google-ads/AdPreview'
 import { AudiencePreview } from '../components/google-ads/AudiencePreview'
 import { EuPoliticalDeclaration } from '../components/google-ads/EuPoliticalDeclaration'
+import { ConversionTracking } from '../components/google-ads/ConversionTracking'
 import { dummyAccounts, estimateLeadsForBudget, getBudgetRecommendations } from '../data/dummy'
 import type { Campaign, CampaignDraft } from '../types'
 import { useConnection } from '../context/ConnectionContext'
@@ -46,6 +47,7 @@ export function CreateCampaign() {
   const [keywordInput, setKeywordInput] = useState('')
   const [locationInput, setLocationInput] = useState('')
   const [euDeclarationError, setEuDeclarationError] = useState(false)
+  const [conversionError, setConversionError] = useState(false)
 
   const recommendations = useMemo(() => getBudgetRecommendations(), [])
 
@@ -67,6 +69,7 @@ export function CreateCampaign() {
     language: 'English',
     keywords: ['web hosting', 'website builder', 'small business website'],
     euPoliticalAdsStatus: null,
+    conversionTracking: null,
   })
 
   const campaignName = useMemo(
@@ -124,6 +127,20 @@ export function CreateCampaign() {
     }
   }
 
+  const continueFromConversion = () => {
+    const c = draft.conversionTracking
+    const valid =
+      !!c &&
+      ((c.type === 'WEBPAGE' && !!c.eventName?.trim()) ||
+        (c.type === 'CLICK_TO_CALL' && !!c.phoneNumber?.trim()))
+    if (!valid) {
+      setConversionError(true)
+      return
+    }
+    setConversionError(false)
+    setStep(4)
+  }
+
   const createCampaign = async (asDraft: boolean) => {
     if (!draft.euPoliticalAdsStatus) {
       setEuDeclarationError(true)
@@ -158,6 +175,7 @@ export function CreateCampaign() {
       language: draft.language,
       keywords: [...draft.keywords],
       euPoliticalAdsStatus: draft.euPoliticalAdsStatus,
+      conversionTracking: draft.conversionTracking ?? undefined,
     }
     addCampaign(account.id, newCampaign)
     setSubmitting(false)
@@ -178,11 +196,11 @@ export function CreateCampaign() {
         ]}
       />
 
-      <div className={step === 2 || step === 3 ? 'max-w-6xl mx-auto' : 'max-w-3xl mx-auto'}>
+      <div className={step === 2 || step === 4 ? 'max-w-6xl mx-auto' : 'max-w-3xl mx-auto'}>
         {step === 1 && (
           <StepWizard
             step={1}
-            totalSteps={4}
+            totalSteps={5}
             title="Set your campaign goal"
             footer={
               <>
@@ -259,7 +277,7 @@ export function CreateCampaign() {
             <div>
           <StepWizard
             step={2}
-            totalSteps={4}
+            totalSteps={5}
             title="Tell us about your business"
             footer={
               <>
@@ -336,16 +354,42 @@ export function CreateCampaign() {
         )}
 
         {step === 3 && (
+          <StepWizard
+            step={3}
+            totalSteps={5}
+            title="Set up conversion tracking"
+            footer={
+              <>
+                <Button variant="secondary" onClick={goBack}>Back</Button>
+                <Button onClick={() => continueFromConversion()}>Continue</Button>
+              </>
+            }
+          >
+            <p className="text-sm text-hpanel-muted mb-5">
+              Pick at least one way Google should measure success. Without conversion tracking, your campaign can't optimize for leads.
+            </p>
+            <ConversionTracking
+              value={draft.conversionTracking}
+              onChange={(c) => {
+                setDraft({ ...draft, conversionTracking: c })
+                setConversionError(false)
+              }}
+              error={conversionError}
+            />
+          </StepWizard>
+        )}
+
+        {step === 4 && (
           <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
             <div>
           <StepWizard
-            step={3}
-            totalSteps={4}
+            step={4}
+            totalSteps={5}
             title="Who should see your ads?"
             footer={
               <>
                 <Button variant="secondary" onClick={goBack}>Back</Button>
-                <Button onClick={() => setStep(4)}>Continue</Button>
+                <Button onClick={() => setStep(5)}>Continue</Button>
               </>
             }
           >
@@ -433,10 +477,10 @@ export function CreateCampaign() {
           </div>
         )}
 
-        {step === 4 && (
+        {step === 5 && (
           <StepWizard
-            step={4}
-            totalSteps={4}
+            step={5}
+            totalSteps={5}
             title="Review your campaign"
             footer={
               <>

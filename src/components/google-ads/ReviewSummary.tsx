@@ -14,6 +14,16 @@ export function ReviewSummary({ campaignName, draft, estimatedLeads }: ReviewSum
       <Row label="Estimated weekly leads" value={estimatedLeads} />
       <Row label="Business name" value={draft.businessName} />
       <Row label="Website" value={draft.websiteUrl} />
+      {draft.conversionTracking && (
+        <Row
+          label="Conversion tracking"
+          value={
+            draft.conversionTracking.type === 'WEBPAGE'
+              ? `Website · "${draft.conversionTracking.eventName ?? 'conversion'}"`
+              : `Phone call · ${draft.conversionTracking.phoneNumber || '—'} (min ${draft.conversionTracking.minDurationSeconds ?? 60}s)`
+          }
+        />
+      )}
       <Row
         label="Headlines"
         value={
