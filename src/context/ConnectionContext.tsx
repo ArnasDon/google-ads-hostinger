@@ -13,6 +13,9 @@ interface ConnectionContextValue {
    *  (payment method + invitation acceptance). Real implementations track this
    *  via the GAFE return state; existing users start `true`, new users `false`. */
   billingSetupCompleted: boolean
+  /** Demo-only suspension flag for the primary account. When true, campaigns
+   *  are blocked from serving and the appeal CTA is surfaced. */
+  accountSuspended: boolean
   creditBannerDismissed: boolean
   authCancelled: boolean
   connect: (isNewUser: boolean) => Promise<void>
@@ -29,6 +32,7 @@ interface ConnectionContextValue {
   approveReview: (accountId: string, campaignId: string) => void
   removeCampaign: (accountId: string, campaignId: string) => void
   completeBillingSetup: () => void
+  setAccountSuspended: (suspended: boolean) => void
 }
 
 // Demo email — in production we'd read this from the OAuth `id_token` claims.
@@ -42,6 +46,7 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
   const [isNewUser, setIsNewUser] = useState(false)
   const [googleAccountEmail, setGoogleAccountEmail] = useState<string | null>(null)
   const [billingSetupCompleted, setBillingSetupCompleted] = useState(false)
+  const [accountSuspended, setAccountSuspended] = useState(false)
   const [creditBannerDismissed, setCreditBannerDismissed] = useState(false)
   const [authCancelled, setAuthCancelled] = useState(false)
   const [campaignsByAccount, setCampaignsByAccount] = useState<Record<string, Campaign[]>>(dummyCampaigns)
@@ -76,6 +81,7 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
     setIsNewUser(false)
     setGoogleAccountEmail(null)
     setBillingSetupCompleted(false)
+    setAccountSuspended(false)
     setCreditBannerDismissed(false)
     setAuthCancelled(false)
     // Restore seed campaigns so re-connecting as an existing user goes back
@@ -152,6 +158,7 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
       isNewUser,
       googleAccountEmail,
       billingSetupCompleted,
+      accountSuspended,
       creditBannerDismissed,
       authCancelled,
       connect,
@@ -166,6 +173,7 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
       approveReview,
       removeCampaign,
       completeBillingSetup,
+      setAccountSuspended,
     }),
     [
       isConnected,
@@ -173,6 +181,7 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
       isNewUser,
       googleAccountEmail,
       billingSetupCompleted,
+      accountSuspended,
       creditBannerDismissed,
       authCancelled,
       connect,
@@ -187,6 +196,7 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
       approveReview,
       removeCampaign,
       completeBillingSetup,
+      setAccountSuspended,
     ]
   )
 

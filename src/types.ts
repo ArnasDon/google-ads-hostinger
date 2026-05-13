@@ -1,6 +1,8 @@
 export type CampaignStatus = 'Active' | 'Paused' | 'Draft'
 
-export type AccountStatus = 'Active' | 'Inactive'
+// Account-level operating state. `Suspended` mirrors Google Ads' policy
+// suspension — campaigns can't serve until the user successfully appeals.
+export type AccountStatus = 'Active' | 'Inactive' | 'Suspended'
 
 // Mirrors Google Ads EuPoliticalAdvertisingStatusEnum.EuPoliticalAdvertisingStatus
 // https://developers.google.com/google-ads/api/reference/rpc/v23/EuPoliticalAdvertisingStatusEnum.EuPoliticalAdvertisingStatus
