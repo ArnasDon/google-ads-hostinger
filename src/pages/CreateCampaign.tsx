@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { CreditCard, ImageIcon, Pause, Target } from 'lucide-react'
 import { Breadcrumbs } from '../components/ui/Breadcrumbs'
 import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
@@ -190,7 +191,9 @@ export function CreateCampaign() {
           >
             <Card className="border-hpanel-primary/40 bg-hpanel-primary-soft" padded={false}>
               <div className="p-5 flex items-start gap-3">
-                <div className="h-10 w-10 rounded-card bg-hpanel-primary flex items-center justify-center text-white flex-shrink-0 text-lg">🎯</div>
+                <div className="h-10 w-10 rounded-card bg-hpanel-primary flex items-center justify-center text-white flex-shrink-0">
+                  <Target size={20} aria-hidden />
+                </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <h3 className="text-base font-semibold text-white">Generate leads for my website</h3>
@@ -420,7 +423,7 @@ export function CreateCampaign() {
 
             <div className="mt-5 rounded-card border border-hpanel-primary/30 bg-hpanel-primary-soft p-4">
               <div className="flex items-start gap-3">
-                <span className="text-lg">⏸</span>
+                <Pause size={18} className="text-hpanel-primary-hover mt-0.5 flex-shrink-0" aria-hidden />
                 <div className="text-sm">
                   <div className="text-white font-medium">Your campaign will start in paused mode.</div>
                   <p className="text-hpanel-muted text-xs mt-0.5">
@@ -432,7 +435,7 @@ export function CreateCampaign() {
 
             <div className="mt-3 rounded-card border border-hpanel-border bg-hpanel-bg/60 p-4">
               <div className="flex items-start gap-3">
-                <span className="text-lg">💳</span>
+                <CreditCard size={18} className="text-hpanel-muted mt-0.5 flex-shrink-0" aria-hidden />
                 <div className="text-sm">
                   <div className="text-white font-medium">Ad spend and payment settings</div>
                   <p className="text-hpanel-muted text-xs mt-0.5">
@@ -462,7 +465,7 @@ export function CreateCampaign() {
 function ImagePlaceholder({ ratio, label }: { ratio: string; label: string }) {
   return (
     <div className="aspect-video bg-hpanel-bg border-2 border-dashed border-hpanel-border-strong rounded-card flex flex-col items-center justify-center text-center p-4 hover:border-hpanel-primary/50 transition cursor-pointer">
-      <span className="text-2xl">🖼️</span>
+      <ImageIcon size={24} className="text-hpanel-muted-strong" aria-hidden />
       <div className="text-sm font-medium text-white mt-2">{label}</div>
       <div className="text-xs text-hpanel-muted">{ratio} ratio</div>
     </div>

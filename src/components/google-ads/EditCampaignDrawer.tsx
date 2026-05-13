@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { X } from 'lucide-react'
 import { Modal } from '../ui/Modal'
 import { Button } from '../ui/Button'
 import { Input } from '../ui/Input'
@@ -88,10 +89,10 @@ export function EditCampaignDrawer({ open, campaign, onClose, onSave }: EditCamp
         </div>
         <button
           onClick={onClose}
-          className="text-hpanel-muted hover:text-white text-lg"
+          className="text-hpanel-muted hover:text-white"
           aria-label="Close"
         >
-          ✕
+          <X size={18} />
         </button>
       </div>
 

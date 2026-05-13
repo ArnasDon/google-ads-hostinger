@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { ImageIcon } from 'lucide-react'
 
 type Surface = 'search' | 'display' | 'youtube'
 
@@ -124,8 +125,8 @@ function DisplayAdMock({
 }) {
   return (
     <div className="bg-white rounded-card overflow-hidden text-black border border-gray-200">
-      <div className="aspect-video bg-gradient-to-br from-purple-100 via-pink-100 to-orange-100 flex items-center justify-center text-3xl">
-        🖼️
+      <div className="aspect-video bg-gradient-to-br from-purple-100 via-pink-100 to-orange-100 flex items-center justify-center text-gray-500">
+        <ImageIcon size={32} aria-hidden />
       </div>
       <div className="p-4">
         <div className="flex items-center gap-2 mb-1.5">

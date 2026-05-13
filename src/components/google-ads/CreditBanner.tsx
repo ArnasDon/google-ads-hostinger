@@ -1,3 +1,4 @@
+import { Gift, X } from 'lucide-react'
 import { Button } from '../ui/Button'
 import { useToast } from '../../context/ToastContext'
 
@@ -10,8 +11,8 @@ export function CreditBanner({ onDismiss }: CreditBannerProps) {
   return (
     <div className="relative overflow-hidden rounded-card border border-hpanel-primary/40 bg-gradient-to-r from-hpanel-primary-soft to-transparent p-5 mb-6">
       <div className="flex items-start gap-4">
-        <div className="h-12 w-12 flex-shrink-0 rounded-card bg-hpanel-primary flex items-center justify-center text-2xl">
-          🎁
+        <div className="h-12 w-12 flex-shrink-0 rounded-card bg-hpanel-primary flex items-center justify-center text-white">
+          <Gift size={22} aria-hidden />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
@@ -34,10 +35,10 @@ export function CreditBanner({ onDismiss }: CreditBannerProps) {
         </div>
         <button
           onClick={onDismiss}
-          className="text-hpanel-muted hover:text-white text-lg flex-shrink-0"
+          className="text-hpanel-muted hover:text-white flex-shrink-0"
           aria-label="Dismiss"
         >
-          ✕
+          <X size={16} />
         </button>
       </div>
     </div>

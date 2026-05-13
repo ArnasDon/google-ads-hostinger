@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { BarChart3 } from 'lucide-react'
 import { Badge } from '../ui/Badge'
 import type { Campaign } from '../../types'
 
@@ -24,8 +25,8 @@ export function CampaignTable({ campaigns, accountId }: CampaignTableProps) {
   if (campaigns.length === 0) {
     return (
       <div className="bg-hpanel-surface border border-hpanel-border rounded-card p-12 text-center">
-        <div className="mx-auto h-12 w-12 rounded-full bg-hpanel-primary-soft flex items-center justify-center text-hpanel-primary-hover text-xl">
-          📊
+        <div className="mx-auto h-12 w-12 rounded-full bg-hpanel-primary-soft flex items-center justify-center text-hpanel-primary-hover">
+          <BarChart3 size={22} aria-hidden />
         </div>
         <h3 className="mt-4 text-base font-semibold text-white">No campaigns yet</h3>
         <p className="mt-1 text-sm text-hpanel-muted max-w-sm mx-auto">
