@@ -3,6 +3,7 @@ import { Breadcrumbs } from '../components/ui/Breadcrumbs'
 import { Badge } from '../components/ui/Badge'
 import { Button } from '../components/ui/Button'
 import { CampaignTable } from '../components/google-ads/CampaignTable'
+import { CustomerReporting } from '../components/google-ads/CustomerReporting'
 import { dummyAccounts } from '../data/dummy'
 import { useConnection } from '../context/ConnectionContext'
 
@@ -47,6 +48,8 @@ export function AccountCampaigns() {
           + Create new campaign
         </Button>
       </div>
+
+      {campaigns.length > 0 && <CustomerReporting campaigns={campaigns} />}
 
       <CampaignTable campaigns={campaigns} accountId={account.id} />
     </div>
