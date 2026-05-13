@@ -245,16 +245,6 @@ export function CreateCampaign() {
                 <span>${BUDGET_MIN}</span>
                 <span>${BUDGET_MAX}</span>
               </div>
-              <div className="mt-3 rounded-card border border-hpanel-border bg-hpanel-bg/60 p-3">
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="text-base">📈</span>
-                  <span className="text-white">
-                    Estimated <span className="font-semibold">{estimateLeads(draft.dailyBudget)}</span> leads / week
-                  </span>
-                  <span className="text-hpanel-muted">·</span>
-                  <span className="text-hpanel-muted">~{estimateLeadsForBudget(draft.dailyBudget).weeklyClicks.toLocaleString()} clicks</span>
-                </div>
-              </div>
             </div>
           </StepWizard>
         )}
