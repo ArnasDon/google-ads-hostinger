@@ -4,6 +4,17 @@ export type CampaignStatus = 'Active' | 'Paused' | 'Draft'
 // suspension — campaigns can't serve until the user successfully appeals.
 export type AccountStatus = 'Active' | 'Inactive' | 'Suspended'
 
+/** Billing/locale settings the user picks when creating a new Google Ads
+ *  account. In real Google Ads these are immutable post-creation. */
+export interface AccountSettings {
+  /** ISO 3166-1 alpha-2 country code, e.g. "US", "DE". */
+  countryCode: string
+  /** IANA time zone name, e.g. "America/New_York". */
+  timeZone: string
+  /** ISO 4217 currency code, e.g. "USD". */
+  currency: string
+}
+
 // Mirrors Google Ads EuPoliticalAdvertisingStatusEnum.EuPoliticalAdvertisingStatus
 // https://developers.google.com/google-ads/api/reference/rpc/v23/EuPoliticalAdvertisingStatusEnum.EuPoliticalAdvertisingStatus
 export type EuPoliticalAdsStatus =

@@ -24,6 +24,7 @@ export function AccountCampaigns() {
     creditBannerDismissed,
     dismissCreditBanner,
     googleAccountEmail,
+    accountSettings,
     billingSetupCompleted,
     accountSuspended,
     setAccountSuspended,
@@ -90,6 +91,15 @@ export function AccountCampaigns() {
           {googleAccountEmail && (
             <p className="text-xs text-hpanel-muted-strong mt-1">
               Connected as <span className="text-white font-medium">{googleAccountEmail}</span>
+            </p>
+          )}
+          {accountSettings && (
+            <p className="text-xs text-hpanel-muted-strong mt-0.5">
+              <span className="text-white">{accountSettings.countryCode}</span>
+              <span className="mx-1.5">·</span>
+              <span className="text-white">{accountSettings.timeZone}</span>
+              <span className="mx-1.5">·</span>
+              <span className="text-white">{accountSettings.currency}</span>
             </p>
           )}
         </div>
