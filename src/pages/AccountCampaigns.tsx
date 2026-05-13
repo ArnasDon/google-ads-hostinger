@@ -4,6 +4,7 @@ import { Badge } from '../components/ui/Badge'
 import { Button } from '../components/ui/Button'
 import { CampaignTable } from '../components/google-ads/CampaignTable'
 import { CustomerReporting } from '../components/google-ads/CustomerReporting'
+import { CreditBanner } from '../components/google-ads/CreditBanner'
 import { dummyAccounts } from '../data/dummy'
 import { useConnection } from '../context/ConnectionContext'
 
@@ -11,8 +12,9 @@ export function AccountCampaigns() {
   const { id = '' } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const account = dummyAccounts.find((a) => a.id === id)
-  const { campaignsByAccount } = useConnection()
+  const { campaignsByAccount, isNewUser, creditBannerDismissed, dismissCreditBanner } = useConnection()
   const campaigns = campaignsByAccount[id] ?? []
+  const showCreditBanner = isNewUser && !creditBannerDismissed
 
   if (!account) {
     return (
@@ -31,7 +33,7 @@ export function AccountCampaigns() {
 
   return (
     <div>
-      <Breadcrumbs items={[{ label: 'Google Ads', to: '/marketing/google-ads' }, { label: account.name }]} />
+      <Breadcrumbs items={[{ label: 'Marketing' }, { label: 'Google Ads' }]} />
 
       <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
         <div>
@@ -48,6 +50,8 @@ export function AccountCampaigns() {
           + Create new campaign
         </Button>
       </div>
+
+      {showCreditBanner && <CreditBanner onDismiss={dismissCreditBanner} />}
 
       {campaigns.length > 0 && <CustomerReporting campaigns={campaigns} />}
 

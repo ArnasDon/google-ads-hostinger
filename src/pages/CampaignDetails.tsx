@@ -52,8 +52,7 @@ export function CampaignDetails() {
     <div>
       <Breadcrumbs
         items={[
-          { label: 'Google Ads', to: '/marketing/google-ads' },
-          { label: account.name, to: `/marketing/google-ads/accounts/${account.id}` },
+          { label: 'Google Ads', to: `/marketing/google-ads/accounts/${account.id}` },
           { label: campaign.name },
         ]}
       />
