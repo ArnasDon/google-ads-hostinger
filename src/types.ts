@@ -49,7 +49,6 @@ export interface Campaign {
   websiteUrl?: string
   locations?: string[]
   language?: string
-  keywords?: string[]
   euPoliticalAdsStatus?: EuPoliticalAdsStatus
   conversionTracking?: ConversionTrackingConfig
 }
@@ -63,7 +62,6 @@ export interface CampaignDraft {
   descriptions: [string, string]
   locations: string[]
   language: string
-  keywords: string[]
   euPoliticalAdsStatus: EuPoliticalAdsStatus | null
   conversionTracking: ConversionTrackingConfig | null
 }

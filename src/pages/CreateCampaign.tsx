@@ -44,7 +44,6 @@ export function CreateCampaign() {
 
   const [step, setStep] = useState(1)
   const [submitting, setSubmitting] = useState(false)
-  const [keywordInput, setKeywordInput] = useState('')
   const [locationInput, setLocationInput] = useState('')
   const [euDeclarationError, setEuDeclarationError] = useState(false)
   const [conversionError, setConversionError] = useState(false)
@@ -67,7 +66,6 @@ export function CreateCampaign() {
     ],
     locations: ['United States'],
     language: 'English',
-    keywords: ['web hosting', 'website builder', 'small business website'],
     euPoliticalAdsStatus: null,
     conversionTracking: null,
   })
@@ -101,15 +99,6 @@ export function CreateCampaign() {
     next[i] = v
     setDraft({ ...draft, descriptions: next })
   }
-
-  const addKeyword = () => {
-    const k = keywordInput.trim().toLowerCase()
-    if (!k || draft.keywords.includes(k)) return
-    setDraft({ ...draft, keywords: [...draft.keywords, k] })
-    setKeywordInput('')
-  }
-  const removeKeyword = (k: string) =>
-    setDraft({ ...draft, keywords: draft.keywords.filter((x) => x !== k) })
 
   const addLocation = (loc: string) => {
     if (draft.locations.includes(loc)) return
@@ -173,7 +162,6 @@ export function CreateCampaign() {
       websiteUrl: draft.websiteUrl,
       locations: [...draft.locations],
       language: draft.language,
-      keywords: [...draft.keywords],
       euPoliticalAdsStatus: draft.euPoliticalAdsStatus,
       conversionTracking: draft.conversionTracking ?? undefined,
     }
@@ -435,43 +423,12 @@ export function CreateCampaign() {
               </Select>
             </div>
 
-            <div className="mt-6">
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className="text-sm font-semibold text-white">Audience signals</h3>
-                <span className="text-xs text-hpanel-muted bg-white/5 rounded-full px-2 py-0.5">Optional</span>
-              </div>
-              <p className="text-xs text-hpanel-muted mb-3">
-                Add keywords to help Google find people interested in your business. These are <em>hints</em> for optimization, not strict targeting.
-              </p>
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Add a keyword"
-                  value={keywordInput}
-                  onChange={(e) => setKeywordInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault()
-                      addKeyword()
-                    }
-                  }}
-                />
-                <Button variant="secondary" onClick={addKeyword} className="flex-shrink-0">Add</Button>
-              </div>
-              <div className="flex flex-wrap gap-2 mt-3">
-                {draft.keywords.map((k) => (
-                  <Chip key={k} onRemove={() => removeKeyword(k)}>
-                    {k}
-                  </Chip>
-                ))}
-              </div>
-            </div>
           </StepWizard>
             </div>
             <AudiencePreview
               businessName={draft.businessName}
               locations={draft.locations}
               language={draft.language}
-              keywords={draft.keywords}
             />
           </div>
         )}

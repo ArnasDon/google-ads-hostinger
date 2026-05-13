@@ -2,7 +2,6 @@ interface AudiencePreviewProps {
   businessName: string
   locations: string[]
   language: string
-  keywords: string[]
 }
 
 const flagByLocation: Record<string, string> = {
@@ -19,19 +18,16 @@ function flagFor(loc: string): string {
   return flagByLocation[loc] ?? '🌍'
 }
 
-// Dummy reach estimate: each country adds a base pool, keywords slightly narrow it
-// to reflect "audience signals" being hints rather than strict filters.
-function estimateReach(locations: string[], keywords: string[]): string {
-  const base = locations.length * 220_000
-  const narrow = Math.max(0.55, 1 - keywords.length * 0.05)
-  const reach = Math.round(base * narrow)
+// Dummy reach estimate: each selected country contributes a base pool.
+function estimateReach(locations: string[]): string {
+  const reach = locations.length * 220_000
   if (reach >= 1_000_000) return `${(reach / 1_000_000).toFixed(1)}M`
   if (reach >= 1_000) return `${Math.round(reach / 1_000)}K`
   return String(reach)
 }
 
-export function AudiencePreview({ businessName, locations, language, keywords }: AudiencePreviewProps) {
-  const reach = estimateReach(locations, keywords)
+export function AudiencePreview({ businessName, locations, language }: AudiencePreviewProps) {
+  const reach = estimateReach(locations)
 
   return (
     <div className="lg:sticky lg:top-4">
@@ -71,33 +67,13 @@ export function AudiencePreview({ businessName, locations, language, keywords }:
           </span>
         </div>
 
-        <div>
-          <div className="text-[10px] uppercase tracking-wider text-hpanel-muted-strong font-medium mb-1.5">
-            Audience signals
-          </div>
-          {keywords.length === 0 ? (
-            <p className="text-xs text-hpanel-muted italic">No signals yet — Google will optimize broadly.</p>
-          ) : (
-            <div className="flex flex-wrap gap-1.5">
-              {keywords.map((k) => (
-                <span
-                  key={k}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-hpanel-primary-soft border border-hpanel-primary/30 px-2.5 py-1 text-xs text-white"
-                >
-                  ✨ {k}
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
-
         <div className="border-t border-hpanel-border pt-3">
           <div className="flex items-baseline justify-between">
             <span className="text-xs text-hpanel-muted">Estimated weekly reach</span>
             <span className="text-xl font-semibold text-white tabular-nums">~{reach}</span>
           </div>
           <p className="text-[11px] text-hpanel-muted-strong mt-1">
-            People who could see {businessName || 'your'} ads based on the selected signals. Audience signals are hints — Google may serve outside them to find conversions.
+            People who could see {businessName || 'your'} ads in the selected locations and language.
           </p>
         </div>
       </div>
