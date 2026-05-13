@@ -15,6 +15,7 @@ interface ConnectionContextValue {
   campaignsByAccount: Record<string, Campaign[]>
   addCampaign: (accountId: string, campaign: Campaign) => void
   updateCampaignStatus: (accountId: string, campaignId: string, status: CampaignStatus) => void
+  updateCampaign: (accountId: string, campaignId: string, patch: Partial<Campaign>) => void
 }
 
 const ConnectionContext = createContext<ConnectionContextValue | null>(null)
@@ -65,6 +66,18 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
     []
   )
 
+  const updateCampaign = useCallback(
+    (accountId: string, campaignId: string, patch: Partial<Campaign>) => {
+      setCampaignsByAccount((prev) => ({
+        ...prev,
+        [accountId]: (prev[accountId] ?? []).map((c) =>
+          c.id === campaignId ? { ...c, ...patch } : c
+        ),
+      }))
+    },
+    []
+  )
+
   const value = useMemo<ConnectionContextValue>(
     () => ({
       isConnected,
@@ -79,6 +92,7 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
       campaignsByAccount,
       addCampaign,
       updateCampaignStatus,
+      updateCampaign,
     }),
     [
       isConnected,
@@ -93,6 +107,7 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
       campaignsByAccount,
       addCampaign,
       updateCampaignStatus,
+      updateCampaign,
     ]
   )
 

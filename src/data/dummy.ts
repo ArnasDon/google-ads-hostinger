@@ -57,6 +57,16 @@ export const dummyAccounts: Account[] = [
   },
 ]
 
+// Seed campaigns are pre-populated with all V1-required fields (locations,
+// language, conversion tracking, EU political ads declaration) so that the
+// edit drawer doesn't pop validation errors on existing data.
+const seededDefaults = {
+  locations: ['United States'],
+  language: 'English',
+  euPoliticalAdsStatus: 'DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING',
+  conversionTracking: { type: 'WEBPAGE', eventName: 'lead_form_submit' },
+} satisfies Partial<Campaign>
+
 export const dummyCampaigns: Record<string, Campaign[]> = {
   'acc-1': [
     {
@@ -74,6 +84,7 @@ export const dummyCampaigns: Record<string, Campaign[]> = {
         'Get Online in Minutes',
         'Free Domain Included',
       ],
+      ...seededDefaults,
     },
     {
       id: 'cmp-2',
@@ -85,6 +96,7 @@ export const dummyCampaigns: Record<string, Campaign[]> = {
       clicks: 120,
       conversions: 5,
       cost: 45.5,
+      ...seededDefaults,
     },
     {
       id: 'cmp-3',
@@ -96,6 +108,7 @@ export const dummyCampaigns: Record<string, Campaign[]> = {
       clicks: 45,
       conversions: 2,
       cost: 12.8,
+      ...seededDefaults,
     },
   ],
   'acc-2': [
@@ -109,6 +122,7 @@ export const dummyCampaigns: Record<string, Campaign[]> = {
       clicks: 180,
       conversions: 12,
       cost: 62.4,
+      ...seededDefaults,
     },
   ],
   'acc-3': [],

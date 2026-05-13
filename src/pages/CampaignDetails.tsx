@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Breadcrumbs } from '../components/ui/Breadcrumbs'
 import { Button } from '../components/ui/Button'
@@ -6,6 +7,7 @@ import { MetricCard } from '../components/google-ads/MetricCard'
 import { PerformanceChart } from '../components/google-ads/PerformanceChart'
 import { AssetGroupCard } from '../components/google-ads/AssetGroupCard'
 import { RecommendationsCard } from '../components/google-ads/RecommendationsCard'
+import { EditCampaignDrawer } from '../components/google-ads/EditCampaignDrawer'
 import { dummyAccounts, dummyChart } from '../data/dummy'
 import { useConnection } from '../context/ConnectionContext'
 import { useToast } from '../context/ToastContext'
@@ -13,8 +15,9 @@ import { useToast } from '../context/ToastContext'
 export function CampaignDetails() {
   const { id = '', campaignId = '' } = useParams<{ id: string; campaignId: string }>()
   const navigate = useNavigate()
-  const { campaignsByAccount, updateCampaignStatus } = useConnection()
+  const { campaignsByAccount, updateCampaignStatus, updateCampaign } = useConnection()
   const { showToast } = useToast()
+  const [editOpen, setEditOpen] = useState(false)
 
   const account = dummyAccounts.find((a) => a.id === id)
   const campaign = (campaignsByAccount[id] ?? []).find((c) => c.id === campaignId)
@@ -65,10 +68,15 @@ export function CampaignDetails() {
             <span className="text-xs text-hpanel-muted">{campaign.type} campaign</span>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-hpanel-muted">Paused</span>
-          <ToggleSwitch checked={campaign.status === 'Active'} onChange={toggleStatus} />
-          <span className="text-sm text-white font-medium">Active</span>
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-hpanel-muted">Paused</span>
+            <ToggleSwitch checked={campaign.status === 'Active'} onChange={toggleStatus} />
+            <span className="text-sm text-white font-medium">Active</span>
+          </div>
+          <Button variant="secondary" onClick={() => setEditOpen(true)}>
+            Edit settings
+          </Button>
         </div>
       </div>
 
@@ -101,6 +109,13 @@ export function CampaignDetails() {
       <p className="text-xs text-hpanel-muted-strong mt-4 italic">
         Note: These are dummy demo interactions — no real changes are made to your Google Ads account.
       </p>
+
+      <EditCampaignDrawer
+        open={editOpen}
+        campaign={campaign}
+        onClose={() => setEditOpen(false)}
+        onSave={(patch) => updateCampaign(id, campaignId, patch)}
+      />
     </div>
   )
 }
