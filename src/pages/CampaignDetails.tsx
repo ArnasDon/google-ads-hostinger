@@ -105,10 +105,6 @@ export function CampaignDetails() {
         <RecommendationsCard />
       </div>
 
-      <p className="text-xs text-hpanel-muted-strong mt-4 italic">
-        Note: These are dummy demo interactions — no real changes are made to your Google Ads account.
-      </p>
-
       <EditCampaignDrawer
         open={editOpen}
         campaign={campaign}
