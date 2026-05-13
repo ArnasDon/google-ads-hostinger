@@ -1,62 +1,29 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import type { Campaign } from '../../types'
 
 interface CustomerReportingProps {
   campaigns: Campaign[]
 }
 
-type Range = '7d' | '30d' | '90d'
-
-// Multipliers loosely simulate Google Ads metric scaling across windows.
-// Numbers are dummy — the real client would call CampaignService /
-// CustomerService with the chosen date_range and get back actual metrics.
-const rangeMultipliers: Record<Range, number> = {
-  '7d': 1,
-  '30d': 4.1,
-  '90d': 11.8,
-}
-
-const rangeLabels: Record<Range, string> = {
-  '7d': 'Last 7 days',
-  '30d': 'Last 30 days',
-  '90d': 'Last 90 days',
-}
-
 export function CustomerReporting({ campaigns }: CustomerReportingProps) {
-  const [range, setRange] = useState<Range>('7d')
-
   const totals = useMemo(() => {
     const active = campaigns.filter((c) => c.status !== 'Draft')
-    const mul = rangeMultipliers[range]
     return {
-      clicks: Math.round(active.reduce((sum, c) => sum + c.clicks, 0) * mul),
-      cost: active.reduce((sum, c) => sum + c.cost, 0) * mul,
-      conversions: Math.round(active.reduce((sum, c) => sum + c.conversions, 0) * mul),
+      clicks: active.reduce((sum, c) => sum + c.clicks, 0),
+      cost: active.reduce((sum, c) => sum + c.cost, 0),
+      conversions: active.reduce((sum, c) => sum + c.conversions, 0),
       activeCount: active.filter((c) => c.status === 'Active').length,
       totalCount: active.length,
     }
-  }, [campaigns, range])
+  }, [campaigns])
 
   return (
     <div className="bg-hpanel-surface border border-hpanel-border rounded-card shadow-card mb-6 p-5">
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-        <div>
-          <h2 className="text-base font-semibold text-white">Customer performance</h2>
-          <p className="text-xs text-hpanel-muted mt-0.5">
-            Totals across {totals.totalCount} campaign{totals.totalCount === 1 ? '' : 's'} ({totals.activeCount} active)
-          </p>
-        </div>
-        <select
-          value={range}
-          onChange={(e) => setRange(e.target.value as Range)}
-          className="h-9 px-3 rounded-card bg-hpanel-bg border border-hpanel-border-strong text-white text-sm focus:outline-none focus:ring-2 focus:ring-hpanel-primary"
-        >
-          {(Object.keys(rangeLabels) as Range[]).map((r) => (
-            <option key={r} value={r}>
-              {rangeLabels[r]}
-            </option>
-          ))}
-        </select>
+      <div className="mb-4">
+        <h2 className="text-base font-semibold text-white">Customer performance</h2>
+        <p className="text-xs text-hpanel-muted mt-0.5">
+          Totals across {totals.totalCount} campaign{totals.totalCount === 1 ? '' : 's'} ({totals.activeCount} active)
+        </p>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-3">
