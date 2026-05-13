@@ -79,10 +79,12 @@ export function EditCampaignDrawer({ open, campaign, onClose, onSave }: EditCamp
   }
 
   return (
-    <Modal open={open} onClose={onClose} width="max-w-2xl">
+    <Modal open={open} onClose={onClose} width="max-w-2xl" titleId="edit-campaign-title">
       <div className="flex items-center justify-between border-b border-hpanel-border p-5">
         <div>
-          <h2 className="text-base font-semibold text-white">Edit campaign settings</h2>
+          <h2 id="edit-campaign-title" className="text-base font-semibold text-white">
+            Edit campaign settings
+          </h2>
           <p className="text-xs text-hpanel-muted mt-0.5">
             Changes apply immediately. Only V1-required fields are editable.
           </p>

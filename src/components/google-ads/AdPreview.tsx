@@ -44,14 +44,19 @@ export function AdPreview({ businessName, websiteUrl, headlines, descriptions }:
         <span className="text-xs text-hpanel-muted">Updates as you type</span>
       </div>
 
-      <div className="flex items-center gap-1 p-1 bg-hpanel-bg/60 border border-hpanel-border rounded-card mb-3">
+      <div
+        role="group"
+        aria-label="Choose ad surface to preview"
+        className="flex items-center gap-1 p-1 bg-hpanel-bg/60 border border-hpanel-border rounded-card mb-3"
+      >
         {(['search', 'display', 'youtube'] as const).map((s) => (
           <button
             key={s}
             type="button"
             onClick={() => setSurface(s)}
+            aria-pressed={surface === s}
             className={[
-              'flex-1 h-8 text-xs font-medium rounded-[6px] transition',
+              'flex-1 h-8 text-xs font-medium rounded-[6px] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hpanel-primary',
               surface === s ? 'bg-hpanel-primary text-white' : 'text-hpanel-muted hover:text-white',
             ].join(' ')}
           >

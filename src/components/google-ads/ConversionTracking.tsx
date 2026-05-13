@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Copy, Globe, Phone } from 'lucide-react'
+import { RadioGroup, RadioOption } from '../ui/RadioGroup'
 import type { ConversionTrackingConfig, ConversionType } from '../../types'
 import { Input } from '../ui/Input'
 import { Button } from '../ui/Button'
@@ -70,22 +71,40 @@ export function ConversionTracking({ value, onChange, error }: ConversionTrackin
 
   return (
     <div>
-      <div className="grid gap-3 sm:grid-cols-2 mb-5">
-        <TypeOption
-          selected={type === 'WEBPAGE'}
-          onClick={() => selectType('WEBPAGE')}
-          icon={<Globe size={18} aria-hidden />}
-          title="Website conversion"
-          description="Count form submissions, sign-ups, or purchases on your site."
-        />
-        <TypeOption
-          selected={type === 'CLICK_TO_CALL'}
-          onClick={() => selectType('CLICK_TO_CALL')}
-          icon={<Phone size={18} aria-hidden />}
-          title="Phone call conversion"
-          description="Count phone calls from people who saw your ad."
-        />
-      </div>
+      <RadioGroup<ConversionType>
+        label="Conversion type"
+        value={type}
+        onChange={selectType}
+        orientation="horizontal"
+        className="mb-5"
+      >
+        <div className="grid gap-3 sm:grid-cols-2">
+          <RadioOption<ConversionType>
+            value="WEBPAGE"
+            className="text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hpanel-primary rounded-card"
+            render={({ selected }) => (
+              <TypeOptionCard
+                selected={selected}
+                icon={<Globe size={18} aria-hidden />}
+                title="Website conversion"
+                description="Count form submissions, sign-ups, or purchases on your site."
+              />
+            )}
+          />
+          <RadioOption<ConversionType>
+            value="CLICK_TO_CALL"
+            className="text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hpanel-primary rounded-card"
+            render={({ selected }) => (
+              <TypeOptionCard
+                selected={selected}
+                icon={<Phone size={18} aria-hidden />}
+                title="Phone call conversion"
+                description="Count phone calls from people who saw your ad."
+              />
+            )}
+          />
+        </div>
+      </RadioGroup>
 
       {error && (
         <p className="mb-3 text-xs text-hpanel-danger font-medium">
@@ -145,25 +164,21 @@ export function ConversionTracking({ value, onChange, error }: ConversionTrackin
   )
 }
 
-function TypeOption({
+function TypeOptionCard({
   selected,
-  onClick,
   icon,
   title,
   description,
 }: {
   selected: boolean
-  onClick: () => void
   icon: ReactNode
   title: string
   description: string
 }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
+    <div
       className={[
-        'text-left rounded-card border p-4 transition',
+        'h-full rounded-card border p-4 transition',
         selected
           ? 'bg-hpanel-primary-soft border-hpanel-primary ring-1 ring-hpanel-primary'
           : 'bg-hpanel-bg/60 border-hpanel-border-strong hover:border-hpanel-primary/50',
@@ -174,6 +189,6 @@ function TypeOption({
         <span className="text-sm font-semibold text-white">{title}</span>
       </div>
       <p className="text-xs text-hpanel-muted mt-1.5">{description}</p>
-    </button>
+    </div>
   )
 }

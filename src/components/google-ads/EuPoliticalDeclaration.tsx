@@ -1,3 +1,4 @@
+import { RadioGroup, RadioOption } from '../ui/RadioGroup'
 import type { EuPoliticalAdsStatus } from '../../types'
 
 interface EuPoliticalDeclarationProps {
@@ -35,34 +36,43 @@ export function EuPoliticalDeclaration({ value, onChange, error }: EuPoliticalDe
         Required by EU regulation for all Google Ads campaigns. This declaration is sent to Google when the campaign is created.
       </p>
 
-      <div className="space-y-2">
-        {options.map((opt) => {
-          const selected = value === opt.value
-          return (
-            <button
+      <RadioGroup<EuPoliticalAdsStatus>
+        label="EU political advertising status"
+        value={value}
+        onChange={onChange}
+        orientation="vertical"
+      >
+        <div className="space-y-2">
+          {options.map((opt) => (
+            <RadioOption<EuPoliticalAdsStatus>
               key={opt.value}
-              type="button"
-              onClick={() => onChange(opt.value)}
-              className={[
-                'w-full flex items-start gap-2.5 text-left rounded-card border p-3 transition',
-                selected
-                  ? 'border-hpanel-primary bg-hpanel-primary-soft'
-                  : 'border-hpanel-border-strong bg-transparent hover:border-hpanel-primary/50',
-              ].join(' ')}
-            >
-              <span
-                className={[
-                  'mt-0.5 inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border-2',
-                  selected ? 'border-hpanel-primary' : 'border-hpanel-muted',
-                ].join(' ')}
-              >
-                {selected && <span className="h-2 w-2 rounded-full bg-hpanel-primary" />}
-              </span>
-              <span className="text-sm text-white">{opt.label}</span>
-            </button>
-          )
-        })}
-      </div>
+              value={opt.value}
+              className="w-full text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hpanel-primary rounded-card"
+              render={({ selected }) => (
+                <div
+                  className={[
+                    'w-full flex items-start gap-2.5 rounded-card border p-3 transition',
+                    selected
+                      ? 'border-hpanel-primary bg-hpanel-primary-soft'
+                      : 'border-hpanel-border-strong bg-transparent hover:border-hpanel-primary/50',
+                  ].join(' ')}
+                >
+                  <span
+                    className={[
+                      'mt-0.5 inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border-2',
+                      selected ? 'border-hpanel-primary' : 'border-hpanel-muted',
+                    ].join(' ')}
+                    aria-hidden
+                  >
+                    {selected && <span className="h-2 w-2 rounded-full bg-hpanel-primary" />}
+                  </span>
+                  <span className="text-sm text-white">{opt.label}</span>
+                </div>
+              )}
+            />
+          ))}
+        </div>
+      </RadioGroup>
 
       {error && (
         <p className="mt-3 text-xs text-hpanel-danger font-medium">
