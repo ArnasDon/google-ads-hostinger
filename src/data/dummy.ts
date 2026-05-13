@@ -5,6 +5,17 @@ import type { Account, Campaign, ChartPoint } from '../types'
 // Multi-account (MCC / agency) support is intentionally out of scope.
 export const PRIMARY_ACCOUNT_ID = 'acc-1'
 
+// Suggested locations shown when picking targeting / editing the campaign.
+// Kept in the data module so the wizard and edit drawer stay in sync.
+export const locationSuggestions = [
+  'United Kingdom',
+  'Germany',
+  'Canada',
+  'Australia',
+  'France',
+  'Spain',
+]
+
 export const dummyAccounts: Account[] = [
   {
     id: PRIMARY_ACCOUNT_ID,

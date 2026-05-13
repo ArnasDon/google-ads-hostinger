@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { CreditCard, ImageIcon, Pause, Target } from 'lucide-react'
 import { Breadcrumbs } from '../components/ui/Breadcrumbs'
@@ -15,12 +15,16 @@ import { AdPreview } from '../components/google-ads/AdPreview'
 import { AudiencePreview } from '../components/google-ads/AudiencePreview'
 import { EuPoliticalDeclaration } from '../components/google-ads/EuPoliticalDeclaration'
 import { ConversionTracking } from '../components/google-ads/ConversionTracking'
-import { dummyAccounts } from '../data/dummy'
-import type { Campaign, CampaignDraft } from '../types'
+import { dummyAccounts, locationSuggestions } from '../data/dummy'
+import type {
+  Campaign,
+  CampaignDraft,
+  ConversionTrackingConfig,
+  EuPoliticalAdsStatus,
+} from '../types'
 import { useConnection } from '../context/ConnectionContext'
 import { useToast } from '../context/ToastContext'
 
-const locationSuggestions = ['United Kingdom', 'Germany', 'Canada', 'Australia', 'France', 'Spain']
 const BUDGET_MIN = 5
 const BUDGET_MAX = 500
 const BUDGET_DEFAULT = 15
@@ -83,23 +87,39 @@ export function CreateCampaign() {
   }
 
   const setHeadline = (i: 0 | 1 | 2, v: string) => {
-    const next = [...draft.headlines] as CampaignDraft['headlines']
-    next[i] = v
-    setDraft({ ...draft, headlines: next })
+    setDraft((d) => ({
+      ...d,
+      headlines: [
+        i === 0 ? v : d.headlines[0],
+        i === 1 ? v : d.headlines[1],
+        i === 2 ? v : d.headlines[2],
+      ],
+    }))
   }
   const setDescription = (i: 0 | 1, v: string) => {
-    const next = [...draft.descriptions] as CampaignDraft['descriptions']
-    next[i] = v
-    setDraft({ ...draft, descriptions: next })
+    setDraft((d) => ({
+      ...d,
+      descriptions: [i === 0 ? v : d.descriptions[0], i === 1 ? v : d.descriptions[1]],
+    }))
   }
 
   const addLocation = (loc: string) => {
-    if (draft.locations.includes(loc)) return
-    setDraft({ ...draft, locations: [...draft.locations, loc] })
+    setDraft((d) => (d.locations.includes(loc) ? d : { ...d, locations: [...d.locations, loc] }))
     setLocationInput('')
   }
   const removeLocation = (loc: string) =>
-    setDraft({ ...draft, locations: draft.locations.filter((x) => x !== loc) })
+    setDraft((d) => ({ ...d, locations: d.locations.filter((x) => x !== loc) }))
+
+  // Memoized so child components (ConversionTracking, EuPoliticalDeclaration)
+  // can keep `onChange` in their effect dep arrays without re-firing every render.
+  const handleConversionChange = useCallback((c: ConversionTrackingConfig) => {
+    setDraft((d) => ({ ...d, conversionTracking: c }))
+    setConversionError(false)
+  }, [])
+  const handleEuDeclarationChange = useCallback((s: EuPoliticalAdsStatus) => {
+    setDraft((d) => ({ ...d, euPoliticalAdsStatus: s }))
+    setEuDeclarationError(false)
+  }, [])
 
   const goBack = () => {
     if (step === 1) {
@@ -326,10 +346,7 @@ export function CreateCampaign() {
             </p>
             <ConversionTracking
               value={draft.conversionTracking}
-              onChange={(c) => {
-                setDraft({ ...draft, conversionTracking: c })
-                setConversionError(false)
-              }}
+              onChange={handleConversionChange}
               error={conversionError}
             />
           </StepWizard>
@@ -448,10 +465,7 @@ export function CreateCampaign() {
             <div className="mt-3">
               <EuPoliticalDeclaration
                 value={draft.euPoliticalAdsStatus}
-                onChange={(s) => {
-                  setDraft({ ...draft, euPoliticalAdsStatus: s })
-                  setEuDeclarationError(false)
-                }}
+                onChange={handleEuDeclarationChange}
                 error={euDeclarationError}
               />
             </div>

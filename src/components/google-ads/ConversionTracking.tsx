@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Copy, Globe, Phone } from 'lucide-react'
 import { RadioGroup, RadioOption } from '../ui/RadioGroup'
 import type { ConversionTrackingConfig, ConversionType } from '../../types'
@@ -42,10 +42,8 @@ export function ConversionTracking({ value, onChange, error }: ConversionTrackin
 
   // Mirror local field state up to the parent on every change so the wizard
   // validator always sees the latest values, not a stale onBlur snapshot.
-  const onChangeRef = useRef(onChange)
-  useEffect(() => {
-    onChangeRef.current = onChange
-  }, [onChange])
+  // Parent must memoize `onChange` (otherwise this effect re-fires every
+  // render); CreateCampaign and EditCampaignDrawer both wrap it in useCallback.
   useEffect(() => {
     const next: ConversionTrackingConfig =
       type === 'WEBPAGE'
@@ -55,8 +53,8 @@ export function ConversionTracking({ value, onChange, error }: ConversionTrackin
             phoneNumber: phoneNumber.trim(),
             minDurationSeconds: minDuration,
           }
-    onChangeRef.current(next)
-  }, [type, eventName, phoneNumber, minDuration])
+    onChange(next)
+  }, [type, eventName, phoneNumber, minDuration, onChange])
 
   const selectType = (t: ConversionType) => setType(t)
 
