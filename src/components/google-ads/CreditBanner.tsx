@@ -22,7 +22,7 @@ export function CreditBanner({ onDismiss }: CreditBannerProps) {
             </span>
           </div>
           <p className="text-sm text-hpanel-muted mt-1">
-            Spend $500 in your first 60 days and Google will match it up to $500. Offer for new advertisers in eligible regions. Terms apply.
+            Spend $500 in your first 60 days, and Google will credit your account with up to $500. The credit is applied within 35 days of meeting the spend threshold. Offer for new advertisers in eligible regions. Terms apply.
           </p>
           <div className="mt-3 flex gap-2">
             <Button size="sm" onClick={() => showToast('Credit offer applied to your account (demo)', 'success')}>
