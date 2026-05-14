@@ -60,8 +60,7 @@ export function EditCampaignDrawer({ open, campaign, onClose, onSave }: EditCamp
 
   const conversionValid = useMemo(() => {
     if (!conversionTracking) return false
-    if (conversionTracking.type === 'WEBPAGE') return !!conversionTracking.eventName?.trim()
-    return !!conversionTracking.phoneNumber?.trim()
+    return !!conversionTracking.eventName?.trim()
   }, [conversionTracking])
 
   const handleSave = () => {

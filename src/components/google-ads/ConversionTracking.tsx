@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
-import { CheckCircle2, ChevronDown, ChevronRight, Copy, Globe, Phone, Zap } from 'lucide-react'
-import { RadioGroup, RadioOption } from '../ui/RadioGroup'
-import type { ConversionTrackingConfig, ConversionType } from '../../types'
+import { useEffect, useMemo, useState } from 'react'
+import { CheckCircle2, ChevronDown, ChevronRight, Copy, Globe, Zap } from 'lucide-react'
+import type { ConversionTrackingConfig } from '../../types'
 import { Input } from '../ui/Input'
 import { Button } from '../ui/Button'
 import { useConnection } from '../../context/ConnectionContext'
@@ -33,11 +32,8 @@ function buildWebpageSnippet(eventName: string): string {
 }
 
 export function ConversionTracking({ value, onChange, error }: ConversionTrackingProps) {
-  const [type, setType] = useState<ConversionType>(value?.type ?? 'WEBPAGE')
   const [eventName, setEventName] = useState(value?.eventName ?? 'lead_form_submit')
   const [successUrl, setSuccessUrl] = useState(value?.successUrl ?? '')
-  const [phoneNumber, setPhoneNumber] = useState(value?.phoneNumber ?? '')
-  const [minDuration, setMinDuration] = useState(value?.minDurationSeconds ?? 60)
   const [snippetExpanded, setSnippetExpanded] = useState(false)
   const [deploying, setDeploying] = useState(false)
   const { googleTagDeployed, deployGoogleTag } = useConnection()
@@ -50,22 +46,12 @@ export function ConversionTracking({ value, onChange, error }: ConversionTrackin
   // Parent must memoize `onChange` (otherwise this effect re-fires every
   // render); CreateCampaign and EditCampaignDrawer both wrap it in useCallback.
   useEffect(() => {
-    const next: ConversionTrackingConfig =
-      type === 'WEBPAGE'
-        ? {
-            type: 'WEBPAGE',
-            eventName: eventName.trim() || 'conversion',
-            successUrl: successUrl.trim() || undefined,
-          }
-        : {
-            type: 'CLICK_TO_CALL',
-            phoneNumber: phoneNumber.trim(),
-            minDurationSeconds: minDuration,
-          }
-    onChange(next)
-  }, [type, eventName, successUrl, phoneNumber, minDuration, onChange])
-
-  const selectType = (t: ConversionType) => setType(t)
+    onChange({
+      type: 'WEBPAGE',
+      eventName: eventName.trim() || 'conversion',
+      successUrl: successUrl.trim() || undefined,
+    })
+  }, [eventName, successUrl, onChange])
 
   const copy = async () => {
     try {
@@ -78,40 +64,15 @@ export function ConversionTracking({ value, onChange, error }: ConversionTrackin
 
   return (
     <div>
-      <RadioGroup<ConversionType>
-        label="Conversion type"
-        value={type}
-        onChange={selectType}
-        orientation="horizontal"
-        className="mb-5"
-      >
-        <div className="grid gap-3 sm:grid-cols-2">
-          <RadioOption<ConversionType>
-            value="WEBPAGE"
-            className="text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hpanel-primary rounded-card"
-            render={({ selected }) => (
-              <TypeOptionCard
-                selected={selected}
-                icon={<Globe size={18} aria-hidden />}
-                title="Website conversion"
-                description="Count form submissions, sign-ups, or purchases on your site."
-              />
-            )}
-          />
-          <RadioOption<ConversionType>
-            value="CLICK_TO_CALL"
-            className="text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hpanel-primary rounded-card"
-            render={({ selected }) => (
-              <TypeOptionCard
-                selected={selected}
-                icon={<Phone size={18} aria-hidden />}
-                title="Phone call conversion"
-                description="Count phone calls from people who saw your ad."
-              />
-            )}
-          />
+      <div className="mb-5 rounded-card border border-hpanel-border-strong bg-hpanel-bg/60 p-4 flex items-start gap-3">
+        <Globe size={18} className="text-hpanel-primary-hover mt-0.5 flex-shrink-0" aria-hidden />
+        <div>
+          <div className="text-sm font-semibold text-white">Website conversion</div>
+          <p className="text-xs text-hpanel-muted mt-0.5">
+            Count form submissions, sign-ups, or purchases on your site.
+          </p>
         </div>
-      </RadioGroup>
+      </div>
 
       {error && (
         <p className="mb-3 text-xs text-hpanel-danger font-medium">
@@ -119,8 +80,7 @@ export function ConversionTracking({ value, onChange, error }: ConversionTrackin
         </p>
       )}
 
-      {type === 'WEBPAGE' && (
-        <div className="space-y-4">
+      <div className="space-y-4">
           <Input
             label="Conversion event name"
             hint="A short slug Google uses to identify this conversion."
@@ -200,58 +160,6 @@ export function ConversionTracking({ value, onChange, error }: ConversionTrackin
             )}
           </div>
         </div>
-      )}
-
-      {type === 'CLICK_TO_CALL' && (
-        <div className="space-y-4">
-          <Input
-            label="Phone number"
-            hint="Include the country code. We'll show this number in the ad and count calls of any length as conversions when set to 1."
-            placeholder="+1 555 123 4567"
-            type="tel"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-          />
-          <Input
-            label="Minimum call duration (seconds)"
-            hint="Calls shorter than this are not counted as conversions."
-            type="number"
-            min={1}
-            max={600}
-            value={minDuration}
-            onChange={(e) => setMinDuration(Number(e.target.value))}
-          />
-        </div>
-      )}
-    </div>
-  )
-}
-
-function TypeOptionCard({
-  selected,
-  icon,
-  title,
-  description,
-}: {
-  selected: boolean
-  icon: ReactNode
-  title: string
-  description: string
-}) {
-  return (
-    <div
-      className={[
-        'h-full rounded-card border p-4 transition',
-        selected
-          ? 'bg-hpanel-primary-soft border-hpanel-primary ring-1 ring-hpanel-primary'
-          : 'bg-hpanel-bg/60 border-hpanel-border-strong hover:border-hpanel-primary/50',
-      ].join(' ')}
-    >
-      <div className="flex items-center gap-2 text-hpanel-primary-hover">
-        {icon}
-        <span className="text-sm font-semibold text-white">{title}</span>
-      </div>
-      <p className="text-xs text-hpanel-muted mt-1.5">{description}</p>
     </div>
   )
 }
