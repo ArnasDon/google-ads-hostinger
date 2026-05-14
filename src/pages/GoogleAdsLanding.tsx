@@ -4,7 +4,6 @@ import {
   ArrowRight,
   Check,
   Clock,
-  Play,
   ShieldCheck,
   Sparkles,
   TrendingUp,
@@ -100,9 +99,6 @@ export function GoogleAdsLanding() {
                 Connect Google Ads account
                 <ArrowRight size={16} aria-hidden />
               </Button>
-              <Button size="lg" variant="secondary" leftIcon={<Play size={16} aria-hidden />}>
-                Watch 60-second tour
-              </Button>
             </div>
 
             <div className="mt-6 flex flex-wrap items-center gap-4 text-[13px] text-hpanel-muted">
@@ -118,11 +114,14 @@ export function GoogleAdsLanding() {
             </div>
           </div>
 
-          {/* Right column — perspective-tilted Google Search ad mock */}
+          {/* Right column — perspective-tilted Google Search ad mock.
+              Note: shadow lives on <SearchAdMock> itself rather than via a
+              `filter: drop-shadow(...)` wrapper — drop-shadow rasterises the
+              tilted subtree and softens the text. The transform-style /
+              backface hints keep the 3D layer crisp. */}
           <div className="relative">
             <div
-              className="lg:[transform:perspective(1400px)_rotateY(-6deg)_rotateX(2deg)] lg:origin-left"
-              style={{ filter: 'drop-shadow(0 60px 60px rgba(0,0,0,0.55))' }}
+              className="lg:[transform:perspective(1400px)_rotateY(-5deg)_rotateX(1.5deg)] lg:origin-left lg:[transform-style:preserve-3d] lg:[backface-visibility:hidden] lg:[will-change:transform]"
             >
               <SearchAdMock />
             </div>
