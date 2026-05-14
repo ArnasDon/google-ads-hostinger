@@ -14,25 +14,8 @@ import {
 import { Button } from '../components/ui/Button'
 import { OAuthModal } from '../components/google-ads/OAuthModal'
 import { CreateAccountWizard } from '../components/google-ads/CreateAccountWizard'
-import { AdPreview } from '../components/google-ads/AdPreview'
+import { SearchAdMock } from '../components/google-ads/SearchAdMock'
 import { useConnection } from '../context/ConnectionContext'
-
-/* Sample data for the live ad preview. Matches the Acme Coffee Roasters mock
- * shown in the design spec — a generic small business reads as aspirational
- * rather than tied to any one industry. */
-const SAMPLE_AD = {
-  businessName: 'Acme Coffee Roasters',
-  websiteUrl: 'acmecoffee.co',
-  headlines: [
-    'Specialty coffee, fresh-roasted weekly',
-    'Sampler box from $24',
-    'Free shipping on your first order',
-  ],
-  descriptions: [
-    'Award-winning beans from small farms in Ethiopia, Colombia, and Guatemala. 10% off your first month with code ACME10.',
-    'Pick a roast, pause anytime. Subscribe and save on every delivery.',
-  ],
-}
 
 const steps = [
   {
@@ -135,20 +118,13 @@ export function GoogleAdsLanding() {
             </div>
           </div>
 
-          {/* Right column — perspective-tilted ad preview */}
+          {/* Right column — perspective-tilted Google Search ad mock */}
           <div className="relative">
             <div
               className="lg:[transform:perspective(1400px)_rotateY(-6deg)_rotateX(2deg)] lg:origin-left"
-              style={{
-                filter: 'drop-shadow(0 60px 60px rgba(0,0,0,0.55))',
-              }}
+              style={{ filter: 'drop-shadow(0 60px 60px rgba(0,0,0,0.55))' }}
             >
-              <AdPreview
-                businessName={SAMPLE_AD.businessName}
-                websiteUrl={SAMPLE_AD.websiteUrl}
-                headlines={SAMPLE_AD.headlines}
-                descriptions={SAMPLE_AD.descriptions}
-              />
+              <SearchAdMock />
             </div>
             <div className="mt-3 flex items-center justify-end gap-2 text-[11px] text-hpanel-muted-strong">
               <span className="inline-flex items-center gap-1">
