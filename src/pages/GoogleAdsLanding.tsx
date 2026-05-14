@@ -74,34 +74,34 @@ export function GoogleAdsLanding() {
 
       {/* ============================ HERO — Split layout ============================ */}
       <section
-        className="relative overflow-hidden rounded-[28px] border border-white/[0.08] p-8 lg:p-16"
+        className="relative overflow-hidden rounded-[28px] border border-white/[0.08] p-7 lg:px-14 lg:py-10"
         style={{
           background:
             'radial-gradient(140% 90% at 0% 0%, rgba(103,61,230,0.22) 0%, rgba(103,61,230,0.06) 35%, rgba(103,61,230,0) 60%), #131318',
         }}
       >
-        <div className="grid items-center gap-10 lg:gap-16 lg:grid-cols-[minmax(360px,1fr)_minmax(0,1.1fr)]">
+        <div className="grid items-center gap-8 lg:gap-12 lg:grid-cols-[minmax(360px,1fr)_minmax(0,1.05fr)]">
           {/* Left column — headline + CTAs */}
           <div>
             <span className="inline-flex items-center gap-2 rounded-full border border-hpanel-primary/40 bg-hpanel-primary/15 pl-2 pr-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-[#C8B5FF]">
               <span className="h-1.5 w-1.5 rounded-full bg-[#9747FF]" />
               New · Marketing
             </span>
-            <h1 className="mt-4 text-[40px] sm:text-5xl lg:text-[60px] font-black text-white leading-[1.02] tracking-[-0.025em]">
+            <h1 className="mt-3.5 text-[32px] sm:text-[40px] lg:text-[46px] font-black text-white leading-[1.05] tracking-[-0.025em]">
               Grow your website with Google Ads.
             </h1>
-            <p className="mt-5 max-w-[56ch] text-[17px] leading-[1.55] text-[#B4B4C2]">
+            <p className="mt-3.5 max-w-[52ch] text-[14px] lg:text-[15px] leading-[1.55] text-[#B4B4C2]">
               Reach customers searching for what you sell across Google Search, YouTube, Gmail, and millions of partner sites. Set up your first campaign in minutes, no Google Ads experience needed.
             </p>
 
-            <div className="mt-7 flex flex-wrap items-center gap-4">
+            <div className="mt-6 flex flex-wrap items-center gap-4">
               <Button size="lg" onClick={() => setModalOpen(true)}>
                 Connect Google Ads account
                 <ArrowRight size={16} aria-hidden />
               </Button>
             </div>
 
-            <div className="mt-6 flex flex-wrap items-center gap-4 text-[13px] text-hpanel-muted">
+            <div className="mt-5 flex flex-wrap items-center gap-4 text-[13px] text-hpanel-muted">
               <span className="inline-flex items-center gap-2">
                 <ShieldCheck size={14} className="text-hpanel-success" aria-hidden />
                 Disconnect anytime
@@ -125,31 +125,23 @@ export function GoogleAdsLanding() {
             >
               <SearchAdMock />
             </div>
-            <div className="mt-3 flex items-center justify-end gap-2 text-[11px] text-hpanel-muted-strong">
-              <span className="inline-flex items-center gap-1">
-                <span className="h-1.5 w-1.5 rounded-full bg-hpanel-primary-hover" />
-                <span className="h-1.5 w-1.5 rounded-full bg-white/20" />
-                <span className="h-1.5 w-1.5 rounded-full bg-white/20" />
-              </span>
-              <span>Live preview updates as you type during setup.</span>
-            </div>
           </div>
         </div>
       </section>
 
       {/* ============================ HOW IT WORKS ============================ */}
-      <section className="pt-24 text-center">
-        <h2 className="text-3xl lg:text-4xl font-extrabold text-white tracking-[-0.02em]">
+      <section className="pt-10 text-center">
+        <h2 className="text-2xl lg:text-[26px] font-extrabold text-white tracking-[-0.02em]">
           From connect to live in five minutes.
         </h2>
-        <p className="mt-3 mx-auto max-w-[56ch] text-base text-hpanel-muted">
+        <p className="mt-2 mx-auto max-w-[56ch] text-sm text-hpanel-muted">
           No agencies, no jargon, no Google Ads tabs to wrestle with. We translate the hard parts.
         </p>
 
-        <div className="relative mt-12 grid gap-6 md:grid-cols-3 text-left">
+        <div className="relative mt-6 grid gap-5 md:grid-cols-3 text-left">
           {/* Dashed connector — desktop only */}
           <div
-            className="hidden md:block absolute top-[44px] left-[16%] right-[16%] h-px pointer-events-none"
+            className="hidden md:block absolute top-[36px] left-[16%] right-[16%] h-px pointer-events-none"
             aria-hidden
             style={{
               background:
@@ -159,17 +151,17 @@ export function GoogleAdsLanding() {
           {steps.map((step, idx) => (
             <div
               key={step.title}
-              className="relative rounded-[20px] border border-white/[0.08] bg-hpanel-surface p-6 flex flex-col"
+              className="relative rounded-[20px] border border-white/[0.08] bg-hpanel-surface p-5 flex flex-col"
             >
               <div
-                className="h-9 w-9 rounded-full bg-hpanel-primary text-white grid place-items-center text-[15px] font-extrabold mb-5"
+                className="h-8 w-8 rounded-full bg-hpanel-primary text-white grid place-items-center text-sm font-extrabold mb-4"
                 style={{ boxShadow: '0 0 0 6px rgba(103,61,230,0.12)' }}
               >
                 {idx + 1}
               </div>
-              <h3 className="text-lg font-bold text-white tracking-[-0.01em] mb-1.5">{step.title}</h3>
-              <p className="text-sm text-hpanel-muted leading-[1.55]">{step.description}</p>
-              <span className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold tracking-wider text-hpanel-muted-strong">
+              <h3 className="text-base font-bold text-white tracking-[-0.01em] mb-1">{step.title}</h3>
+              <p className="text-[13px] text-hpanel-muted leading-[1.55]">{step.description}</p>
+              <span className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold tracking-wider text-hpanel-muted-strong">
                 {step.tagIcon}
                 {step.tag}
               </span>
@@ -180,7 +172,7 @@ export function GoogleAdsLanding() {
 
       {/* ============================ $500 CREDIT CALLOUT ============================ */}
       <section
-        className="relative overflow-hidden rounded-[24px] mt-16 px-8 lg:px-12 py-10 grid items-center gap-8 lg:grid-cols-[1fr_auto] border"
+        className="relative overflow-hidden rounded-[24px] mt-8 px-8 lg:px-10 py-6 grid items-center gap-8 lg:grid-cols-[1fr_auto] border"
         style={{
           background:
             'radial-gradient(80% 100% at 100% 0%, rgba(151,71,255,0.22) 0%, rgba(151,71,255,0) 60%), #1B143A',
@@ -192,13 +184,13 @@ export function GoogleAdsLanding() {
             <Sparkles size={12} className="text-[#FFD600]" aria-hidden />
             Welcome offer
           </span>
-          <h3 className="mt-3.5 text-2xl lg:text-[32px] font-extrabold text-white tracking-[-0.02em]">
+          <h3 className="mt-3 text-xl lg:text-[26px] font-extrabold text-white tracking-[-0.02em]">
             Get <span className="text-[#FFD24A]">$500 in ad credit</span> on Google.
           </h3>
-          <p className="mt-2 max-w-[56ch] text-[15px] leading-[1.55] text-[#C9C4DD]">
+          <p className="mt-2 max-w-[56ch] text-sm leading-[1.55] text-[#C9C4DD]">
             New advertisers get $500 in Google Ads credit when they spend $500 in the first 60 days. Use it to test creative, audiences, and channels without burning your launch budget.
           </p>
-          <div className="mt-4 flex flex-wrap gap-5 text-xs text-hpanel-muted-strong">
+          <div className="mt-3 flex flex-wrap gap-5 text-xs text-hpanel-muted-strong">
             <span className="inline-flex items-center gap-1.5">
               <Check size={12} aria-hidden /> Applied automatically
             </span>
