@@ -475,7 +475,6 @@ export function CreateCampaign() {
           </StepWizard>
             </div>
             <AudiencePreview
-              businessName={draft.businessName}
               locations={draft.locations}
               language={draft.language}
             />
