@@ -46,6 +46,12 @@ export function CreateCampaign() {
   const [locationInput, setLocationInput] = useState('')
   const [euDeclarationError, setEuDeclarationError] = useState(false)
   const [conversionError, setConversionError] = useState(false)
+  const [step2Errors, setStep2Errors] = useState<{
+    businessName?: boolean
+    websiteUrl?: boolean
+    headlines: [boolean, boolean, boolean]
+    descriptions: [boolean, boolean]
+  }>({ headlines: [false, false, false], descriptions: [false, false] })
 
   const [draft, setDraft] = useState<CampaignDraft>({
     goal: 'leads',
@@ -95,12 +101,53 @@ export function CreateCampaign() {
         i === 2 ? v : d.headlines[2],
       ],
     }))
+    if (v.trim()) {
+      setStep2Errors((e) => {
+        const next = [...e.headlines] as [boolean, boolean, boolean]
+        next[i] = false
+        return { ...e, headlines: next }
+      })
+    }
   }
   const setDescription = (i: 0 | 1, v: string) => {
     setDraft((d) => ({
       ...d,
       descriptions: [i === 0 ? v : d.descriptions[0], i === 1 ? v : d.descriptions[1]],
     }))
+    if (v.trim()) {
+      setStep2Errors((e) => {
+        const next = [...e.descriptions] as [boolean, boolean]
+        next[i] = false
+        return { ...e, descriptions: next }
+      })
+    }
+  }
+
+  const continueFromBusiness = () => {
+    const errs = {
+      businessName: !draft.businessName.trim(),
+      websiteUrl: !draft.websiteUrl.trim(),
+      headlines: [
+        !draft.headlines[0].trim(),
+        !draft.headlines[1].trim(),
+        !draft.headlines[2].trim(),
+      ] as [boolean, boolean, boolean],
+      descriptions: [
+        !draft.descriptions[0].trim(),
+        !draft.descriptions[1].trim(),
+      ] as [boolean, boolean],
+    }
+    const hasError =
+      errs.businessName ||
+      errs.websiteUrl ||
+      errs.headlines.some(Boolean) ||
+      errs.descriptions.some(Boolean)
+    if (hasError) {
+      setStep2Errors(errs)
+      return
+    }
+    setStep2Errors({ headlines: [false, false, false], descriptions: [false, false] })
+    setStep(3)
   }
 
   const addLocation = (loc: string) => {
@@ -263,7 +310,7 @@ export function CreateCampaign() {
             footer={
               <>
                 <Button variant="secondary" onClick={goBack}>Back</Button>
-                <Button onClick={() => setStep(3)}>Continue</Button>
+                <Button onClick={continueFromBusiness}>Continue</Button>
               </>
             }
           >
@@ -271,12 +318,20 @@ export function CreateCampaign() {
               <Input
                 label="Business name"
                 value={draft.businessName}
-                onChange={(e) => setDraft({ ...draft, businessName: e.target.value })}
+                error={step2Errors.businessName ? 'Business name is required.' : undefined}
+                onChange={(e) => {
+                  setDraft({ ...draft, businessName: e.target.value })
+                  if (e.target.value.trim()) setStep2Errors((er) => ({ ...er, businessName: false }))
+                }}
               />
               <Input
                 label="Website URL"
                 value={draft.websiteUrl}
-                onChange={(e) => setDraft({ ...draft, websiteUrl: e.target.value })}
+                error={step2Errors.websiteUrl ? 'Website URL is required.' : undefined}
+                onChange={(e) => {
+                  setDraft({ ...draft, websiteUrl: e.target.value })
+                  if (e.target.value.trim()) setStep2Errors((er) => ({ ...er, websiteUrl: false }))
+                }}
               />
             </div>
 
@@ -291,6 +346,7 @@ export function CreateCampaign() {
                     value={draft.headlines[i]}
                     maxLength={30}
                     showCounter
+                    error={step2Errors.headlines[i] ? 'This headline is required.' : undefined}
                     onChange={(e) => setHeadline(i, e.target.value)}
                   />
                 ))}
@@ -309,6 +365,7 @@ export function CreateCampaign() {
                     maxLength={90}
                     showCounter
                     rows={2}
+                    error={step2Errors.descriptions[i] ? 'This description is required.' : undefined}
                     onChange={(e) => setDescription(i, e.target.value)}
                   />
                 ))}
@@ -316,7 +373,7 @@ export function CreateCampaign() {
             </div>
 
             <div className="mt-6">
-              <h3 className="text-sm font-semibold text-white mb-1">Images (optional)</h3>
+              <h3 className="text-sm font-semibold text-white mb-1">Images</h3>
               <p className="text-xs text-hpanel-muted mb-3">Add visuals to help your ads stand out. Demo only — no upload required.</p>
               <div className="grid gap-3 sm:grid-cols-3">
                 <ImagePlaceholder ratio="1 : 1" label="Logo" />
