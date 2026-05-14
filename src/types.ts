@@ -21,9 +21,11 @@ export type EuPoliticalAdsStatus =
   | 'CONTAINS_EU_POLITICAL_ADVERTISING'
   | 'DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING'
 
-// Mirrors Google Ads ConversionActionTypeEnum (subset). V1 supports at least
-// one type per the feature spec — website page-load or phone call.
-export type ConversionType = 'WEBPAGE' | 'CLICK_TO_CALL'
+// Mirrors Google Ads ConversionActionTypeEnum (subset). V1 only supports
+// website page-load conversions — phone-call conversions were dropped
+// because the Google Ads reporting API doesn't return them back to us in
+// a usable form.
+export type ConversionType = 'WEBPAGE'
 
 // Mirrors Google Ads PolicyApprovalStatus. The policy-review state for an ad
 // is orthogonal to the user-controlled play/pause status: a campaign can be
@@ -35,16 +37,12 @@ export type ReviewStatus = 'UNDER_REVIEW' | 'APPROVED' | 'APPROVED_LIMITED' | 'D
 
 export interface ConversionTrackingConfig {
   type: ConversionType
-  /** For WEBPAGE — short slug e.g. "lead_form_submit". */
+  /** Short slug e.g. "lead_form_submit". */
   eventName?: string
-  /** For WEBPAGE — destination URL Google Ads uses to verify the conversion
-   *  (the "thank-you" / success page the user lands on after submitting a
+  /** Destination URL Google Ads uses to verify the conversion (the
+   *  "thank-you" / success page the user lands on after submitting a
    *  form, completing a checkout, etc.). */
   successUrl?: string
-  /** For CLICK_TO_CALL — phone number to attribute. */
-  phoneNumber?: string
-  /** For CLICK_TO_CALL — call must last this many seconds to count as a conversion. */
-  minDurationSeconds?: number
 }
 
 export interface Account {

@@ -178,11 +178,7 @@ export function CreateCampaign() {
 
   const continueFromConversion = () => {
     const c = draft.conversionTracking
-    const valid =
-      !!c &&
-      ((c.type === 'WEBPAGE' && !!c.eventName?.trim()) ||
-        (c.type === 'CLICK_TO_CALL' && !!c.phoneNumber?.trim()))
-    if (!valid) {
+    if (!c || !c.eventName?.trim()) {
       setConversionError(true)
       return
     }
@@ -405,7 +401,7 @@ export function CreateCampaign() {
             }
           >
             <p className="text-sm text-hpanel-muted mb-5">
-              Pick at least one way Google should measure success. Without conversion tracking, your campaign can't optimize for leads.
+              Tell Google what counts as success on your site. Without conversion tracking, your campaign can't optimize for leads.
             </p>
             <ConversionTracking
               value={draft.conversionTracking}
