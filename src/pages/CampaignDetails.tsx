@@ -131,11 +131,19 @@ export function CampaignDetails() {
 
       <ReviewStatusBanner accountId={id} campaign={campaign} />
 
-      <div className="grid gap-4 md:grid-cols-4 mb-6">
+      <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-5 mb-6">
         <MetricCard label="Impressions" value={campaign.impressions.toLocaleString()} delta={12.3} />
         <MetricCard label="Clicks" value={campaign.clicks.toLocaleString()} delta={8.7} />
         <MetricCard label="Conversions" value={String(campaign.conversions)} delta={15.2} />
         <MetricCard label="Cost" value={`$${campaign.cost.toFixed(2)}`} delta={-3.4} />
+        <MetricCard
+          label="Cost / lead"
+          value={
+            campaign.conversions > 0
+              ? `$${(campaign.cost / campaign.conversions).toFixed(2)}`
+              : '—'
+          }
+        />
       </div>
 
       <div className="bg-hpanel-surface border border-hpanel-border rounded-card shadow-card p-6 mb-6">
