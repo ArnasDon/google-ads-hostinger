@@ -8,7 +8,7 @@ import { Lock, Search, SlidersHorizontal, X } from 'lucide-react'
  */
 export function SearchAdMock() {
   return (
-    <div className="bg-white text-[#18181A] rounded-2xl overflow-hidden shadow-[0_60px_100px_-30px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.06)] font-sans">
+    <div className="bg-white text-[#18181A] rounded-2xl overflow-hidden font-sans subpixel-antialiased shadow-[0_50px_80px_-20px_rgba(0,0,0,0.55),0_30px_40px_-30px_rgba(0,0,0,0.4),0_0_0_1px_rgba(255,255,255,0.06)]">
       {/* Browser chrome */}
       <div className="flex items-center gap-2.5 px-3.5 py-2.5 bg-[#EFEFF1] border-b border-[#DADCE0]">
         <div className="flex gap-1.5">
